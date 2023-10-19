@@ -1,0 +1,8 @@
+<%= render 'navbar' %>
+<%= form_with do |form| %>
+  <%= form.label :prompt, "Enter product price in cents" %>
+  <%= form.number_field :price_cents %>
+  <%= form.label :prompt, "Enter product name" %>
+  <%= form.text_field :name %>
+  <%= form.submit %>
+<% end %>

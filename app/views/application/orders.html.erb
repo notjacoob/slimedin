@@ -1,0 +1,23 @@
+<%= render 'navbar' %>
+<h1>Orders</h1>
+<p>Currently signed in as: <%= current_user.email %></p>
+<table border="1">
+  <thead>
+    <tr>
+      <th>Product</th>
+      <th>Order id</th>
+      <th>Amount paid</th>
+      <th>Purchased at</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% Order.where(:user_id => current_user.id).each do |order| %>
+      <tr>
+        <td><%= Product.where(:id => order.product).first!.name %></td>
+        <td><%= order.id %></td>
+        <td><%= Money.from_cents(order.price_cents) %></td>
+        <td><%= order.created_at.to_s.gsub!(" ", ", ") %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

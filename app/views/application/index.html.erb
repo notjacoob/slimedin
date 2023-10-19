@@ -1,0 +1,22 @@
+<h1>Slimed In</h1>
+<h2>Navigation</h2>
+<%= link_to "Products", {controller: :application, action: :products} %>
+<% if user_signed_in? %>
+  <% if current_user.administrator %>
+    <br>
+    <%= link_to "Add Products", {controller: :administrator, action: :add_products_get} %>
+  <% end %>
+<% end %>
+<br>
+<br>
+<h2>User</h2>
+<%= link_to "Sign Up", "/sign-up" %>
+<br>
+<%= link_to "Sign In", "/sign-in" %>
+<br>
+<% if user_signed_in? %>
+  <%= link_to "Orders", "/orders" %>
+  <br>
+  <%= button_to "logout", destroy_user_session_path, method: :delete %>
+  <p>Current user: <%= current_user.email %></p>
+<% end %>

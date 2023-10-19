@@ -1,0 +1,64 @@
+<%= stylesheet_link_tag "products" %>
+<div class="navbar">
+  <h1>Products</h1>
+  <hr>
+  <div id="navbar">
+    <%= render 'navbar' %>
+  </div>
+  <hr>
+</div>
+<div class="content">
+  <h3 id="product-error" class="unpressed">Please select a product!</h3>
+  <%= form_with :html => {:id => "product"} do |form| %>
+    <%= form.collection_select :product, Product.all, :id, :product_tagline, {prompt: true}, {class: "select", id: "standard-select"} %>
+  <% end %>
+  <div id="paypal-button-container"></div>
+</div>
+<script src="https://www.paypal.com/sdk/js?client-id=<%= ENV["PAYPAL_CLIENT_ID"] %>"></script>
+<script type="module">
+
+  paypal.Buttons({
+      env: "<%= ENV["PAYPAL_ENV"] %>",
+      onInit: function(data, actions) {
+          $("#standard-select").on("change", () => {
+              const productError = $("#product-error")
+              if ($("#standard-select").val() === "") {
+                  actions.disable()
+                  productError.removeClass("invisible")
+              } else {
+                  actions.enable()
+                  productError.addClass("invisible")
+              }
+          })
+      },
+      createOrder: async () => {
+          const pid = $("#standard-select").val()
+          if (pid !== "") {
+              const response = await fetch(`/create-order?pid=${pid}`, {
+                  method: 'POST',
+              });
+              const responseData = await response.json();
+
+              return responseData.token;
+          } else {
+              $("#product-error").toggleClass("invisible")
+          }
+      },
+      onApprove: async(data) => {
+          const response = await fetch ('/capture-order', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ order_id: data.orderID })
+          })
+
+          const responseData = await response.json()
+
+          if (responseData.status === 'COMPLETED') {
+              window.location.href = `<%= request.base_url %>/order_success/${responseData.order}`
+          }
+
+      }
+  }).render("#paypal-button-container");
+</script>

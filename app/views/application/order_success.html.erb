@@ -1,0 +1,4 @@
+<%= render 'navbar' %>
+<h1>Order success!</h1>
+<p>Order id: <%= @order.id %></p>
+<p>Transaction amount: $<%= Money.from_cents(@order.price_cents) %></p>
