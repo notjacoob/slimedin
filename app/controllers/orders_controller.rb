@@ -54,7 +54,7 @@ class OrdersController < ActionController::Base
 
       if order.save
         body = gen_discord_body(order)
-        res = Net::HTTP.post(URI.parse(discord_webhook), body, {"Content-Type": "application/json"})
+        res = Net::HTTP.post(URI.parse(ENV["DISCORD_WEBHOOK"]), body, {"Content-Type": "application/json"})
         return render :json => {:status => response.result.status, :order => order.id}, :status => :ok
       end
     rescue PayPalHttp::HttpError => ioe
@@ -122,9 +122,6 @@ class OrdersController < ActionController::Base
       end
     end
     newarray
-  end
-  def discord_webhook
-    'https://discord.com/api/webhooks/1164792659232165939/J8WWLJih6qSy9USCg4z0l8tyNnrXrBWmFFv2wO7COs_lsGZb85GFjOTRdOOaiUWHWl9I'
   end
   def gen_discord_body(order)
      "{
