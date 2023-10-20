@@ -10,17 +10,44 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_10_19_020634) do
+ActiveRecord::Schema[7.0].define(version: 2023_10_20_050428) do
+  create_table "addresses", force: :cascade do |t|
+    t.text "line1"
+    t.text "city"
+    t.text "state"
+    t.integer "zip"
+    t.boolean "save_for_later"
+    t.integer "address_type"
+    t.integer "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_addresses_on_user_id"
+  end
+
+  create_table "carts", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "order_id"
+    t.text "products", default: "--- []\n"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "total", default: 0
+    t.index ["order_id"], name: "index_carts_on_order_id"
+    t.index ["user_id"], name: "index_carts_on_user_id"
+  end
+
   create_table "orders", force: :cascade do |t|
     t.boolean "paid", default: false
     t.string "token"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "product_id"
     t.integer "user_id"
     t.integer "price_cents", default: 0, null: false
     t.string "price_currency", default: "USD", null: false
-    t.index ["product_id"], name: "index_orders_on_product_id"
+    t.text "products", default: "--- []\n"
+    t.integer "billing_address_id"
+    t.integer "shipping_address_id"
+    t.index ["billing_address_id"], name: "index_orders_on_billing_address_id"
+    t.index ["shipping_address_id"], name: "index_orders_on_shipping_address_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 

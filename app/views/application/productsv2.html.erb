@@ -1,0 +1,15 @@
+<%= render "navbar" %>
+<%= link_to "Cart", "/cart" %>
+<h1>Products</h1>
+<ol>
+  <% Product.all.each do |product| %>
+    <li>
+      <div class="product">
+        <img src="/slime.jpg" height="100" width="100" alt="splaaaat"/>
+        <h3><%= product.name %>, $<%= Money.from_cents product.price_cents %></h3>
+        <%= button_to "Add to cart", controller: :orders, action: :add_cart, pid: product.id %>
+      </div>
+    </li>
+  <% end %>
+
+</ol>

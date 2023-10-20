@@ -1,0 +1,66 @@
+<%= render "navbar" %>
+<h1>Payment</h1>
+<h2>Cart</h2>
+<ul>
+  <% @cart.products.each do |pid| %>
+    <li>
+      <% @product = Product.find(pid) %>
+      <% @subtotal += @product.price_cents %>
+      <h3><%= @product.name %></h3>
+      <h4>$<%= Money.from_cents(@product.price_cents) %></h4>
+    </li>
+  <% end %>
+</ul>
+<hr>
+<h2>Payment info: </h2> <br>
+<h3>Billing address: <%= "#{@billing_address.line1}, #{@billing_address.city}, #{@billing_address.state} #{@billing_address.zip}" %></h3><br>
+<h3>Shipping address: <%= "#{@shipping_address.line1}, #{@shipping_address.city}, #{@shipping_address.state} #{@shipping_address.zip}" %></h3><br>
+<hr>
+<h2>Amount: </h2><br>
+<ul>
+  <% @subtotal = 0 %>
+  <% @cart.products.each do |pid| %>
+    <% @product = Product.where(id: pid).first! %>
+    <li><%= @product.name %> x1 - $<%= Money.from_cents(@product.price_cents) %></li>
+    <% @subtotal += @product.price_cents %>
+  <% end %>
+</ul>
+<h3>Currency: USD</h3>
+<h3>Subtotal: $<%= Money.from_cents(@subtotal) %></h3>
+<h3>Sales tax (<%= @billing_address.city %>, <%= @billing_address.state %>): $<%= Money.from_cents(@tax) %></h3>
+<h3>Total: $<%= Money.from_cents(@total) %></h3>
+<hr>
+<br>
+<script src="https://www.paypal.com/sdk/js?client-id=<%= ENV["PAYPAL_CLIENT_ID"] %>"></script>
+<div id="paypal-button-container"></div>
+<script type="module">
+    paypal.Buttons({
+        env: "<%= ENV["PAYPAL_ENV"] %>",
+        createOrder: async () => {
+            const cartId = <%= @cart.id %>;
+                const response = await fetch(`/create-order/${cartId}`, {
+                    method: 'POST',
+                });
+                const responseData = await response.json();
+
+                return responseData.token;
+        },
+        onApprove: async(data) => {
+            const response = await fetch ('/capture-order', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ order_id: data.orderID })
+            })
+
+            const responseData = await response.json()
+
+            if (responseData.status === 'COMPLETED') {
+                window.location.href = `<%= request.base_url %>/order_success/${responseData.order}`
+            }
+
+        }
+    }).render("#paypal-button-container");
+</script>
+

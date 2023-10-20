@@ -1,0 +1,20 @@
+<%= render "navbar" %>
+<%= link_to "Products", "/products" %>
+<h1>Cart</h1>
+<% if current_user.cart.products.length > 0 %>
+  <ul>
+    <% current_user.cart.products.each do |pid| %>
+      <li>
+        <% @product = Product.find(pid) %>
+        <h3><%= @product.name %></h3>
+        <h4><%= Money.from_cents(@product.price_cents) %></h4>
+        <%= button_to "Remove", controller: :orders, action: :remove_cart, pid: @product.id %>
+      </li>
+    <% end %>
+  </ul>
+  <br>
+  <br>
+  <%= button_to "Checkout", {controller: :application, action: :checkout}, {:method => :get} %>
+<% else %>
+  <h2>Your cart is empty!</h2>
+<% end %>

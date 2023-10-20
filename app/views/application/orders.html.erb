@@ -1,23 +1,40 @@
 <%= render 'navbar' %>
 <h1>Orders</h1>
 <p>Currently signed in as: <%= current_user.email %></p>
-<table border="1">
-  <thead>
-    <tr>
-      <th>Product</th>
-      <th>Order id</th>
-      <th>Amount paid</th>
-      <th>Purchased at</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% Order.where(:user_id => current_user.id).each do |order| %>
+
+<br>
+
+<% Order.where(:user_id => current_user.id).each do |order| %>
+  <hr>
+  <h2><%= order.created_at.to_s.gsub!(" ", ", ") %> - ID: <%= order.id %></h2>
+  <table border="1">
+    <thead>
       <tr>
-        <td><%= Product.where(:id => order.product).first!.name %></td>
-        <td><%= order.id %></td>
-        <td><%= Money.from_cents(order.price_cents) %></td>
-        <td><%= order.created_at.to_s.gsub!(" ", ", ") %></td>
+        <th>Product</th>
+        <th>Price</th>
+        <th>Total</th>
       </tr>
-    <% end %>
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      <% order.products.each do |p| %>
+        <% @product = Product.where(id: p).first! %>
+        <tr>
+          <td><%= @product.name %></td>
+          <td>$<%= Money.from_cents(@product.price_cents) %></td>
+          <td></td>
+        </tr>
+      <% end %>
+    <tr>
+      <td></td>
+      <td></td>
+      <td><strong>$<%= Money.from_cents(order.price_cents) %></strong></td>
+    </tr>
+    </tbody>
+  </table>
+  <% if order.billing_address and order.shipping_address %>
+    <% @billing_address = order.billing_address %>
+    <% @shipping_address = order.shipping_address %>
+    <h3>Billing Address: <%= @billing_address.line1 %>, <%= @billing_address.city %>, <%= @billing_address.state %> <%= @billing_address.zip %></h3>
+    <h3>Shipping Address: <%= @shipping_address.line1 %>, <%= @shipping_address.city %>, <%= @shipping_address.state %> <%= @shipping_address.zip %></h3>
+  <% end %>
+<% end %>

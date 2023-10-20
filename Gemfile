@@ -49,6 +49,7 @@ gem "figaro"
 gem "money-rails"
 gem "money"
 gem "sassc-rails"
+gem "json"
 
 # Use Sass to process CSS
 # gem "sassc-rails"
