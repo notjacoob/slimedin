@@ -31,10 +31,12 @@
     </tr>
     </tbody>
   </table>
-  <% if order.billing_address and order.shipping_address %>
-    <% @billing_address = order.billing_address %>
+  <% if order.shipping_address %>
+    <% if order.billing_address %>
+      <% @billing_address = order.billing_address %>
+      <h3>Billing Address: <%= @billing_address.line1 %>, <%= @billing_address.city %>, <%= @billing_address.state %> <%= @billing_address.zip %></h3>
+    <% end %>
     <% @shipping_address = order.shipping_address %>
-    <h3>Billing Address: <%= @billing_address.line1 %>, <%= @billing_address.city %>, <%= @billing_address.state %> <%= @billing_address.zip %></h3>
     <h3>Shipping Address: <%= @shipping_address.line1 %>, <%= @shipping_address.city %>, <%= @shipping_address.state %> <%= @shipping_address.zip %></h3>
   <% end %>
 <% end %>

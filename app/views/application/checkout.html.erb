@@ -3,45 +3,45 @@
 <% @subtotal = 0 %>
 
 <script type=module>
-  const useSame = () => {
-      if (document.getElementById("use-same").checked) {
-          $("#shipping-address :input").prop('disabled', true)
-      } else {
-          $("#shipping-address :input").prop('disabled', false)
-      }
-  }
-  $("#submit-order").on("click", e => {
-      const checked = document.getElementById("use-same").checked
-      const billing_address_line1 = document.getElementById("billing_address_line1").value
-      const billing_city = document.getElementById("billing_city").value
-      const billing_state_province = document.getElementById("billing_state_province").value
-      const billing_zip = document.getElementById("billing_zip").value
-      fetch("/payment-proceed", {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-              billing_address: {
-                  line1: billing_address_line1,
-                  city: billing_city,
-                  state_province: billing_state_province,
-                  zip: billing_zip,
-                  save: document.getElementById("billing_save").checked
-              },
-              shipping_address: {
-                  line1: checked ? billing_address_line1 : document.getElementById("shipping_address_line1").value,
-                  city: checked ? billing_city : document.getElementById("shipping_city").value,
-                  state_province: checked ? billing_state_province : document.getElementById("shipping_state_province").value,
-                  zip: checked ? billing_zip : document.getElementById("shipping_zip").value,
-                  save: checked ? false : document.getElementById("shipping_save").checked
-              }
-          })
-      }).then(() => {
-          window.location.href = "<%= request.base_url %>" + "/payment"
-      });
-  });
-  window.useSame = useSame
+    const useSame = () => {
+        if (document.getElementById("use-same").checked) {
+            $(".same-usable :input").prop('disabled', true)
+        } else {
+            $(".same-usable :input").prop('disabled', false)
+        }
+    }
+    $("#submit-order").on("click", e => {
+        <% if @use_billing == "true" %>
+            const checked = document.getElementById("use-same").checked
+        <% end %>
+        const shipping_address_line1 = document.getElementById("shipping_address_line1").value
+        const shipping_city = document.getElementById("shipping_city").value
+        const shipping_state_province = document.getElementById("shipping_state_province").value
+        const shipping_zip = document.getElementById("shipping_zip").value
+        fetch("/payment-proceed", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                shipping_address: {
+                    line1: shipping_address_line1,
+                    city: shipping_city,
+                    state_province: shipping_state_province,
+                    zip: shipping_zip
+                }<% if @use_billing == "true" %>,
+                billing_address: {
+                    line1: checked ? shipping_address_line1 : document.getElementById("billing_address_line1").value,
+                    city: checked ? shipping_city : document.getElementById("billing_city").value,
+                    state_province: checked ? shipping_state_province : document.getElementById("billing_state_province").value,
+                    zip: checked ? shipping_zip : document.getElementById("billing_zip").value,
+                }<% end %>
+            })
+        }).then(() => {
+            window.location.href = "<%= request.base_url %>" + "/payment"
+        });
+    });
+    window.useSame = useSame
 </script>
 
 <h1>Checkout</h1><br>
@@ -59,32 +59,29 @@
 <h3>Subtotal: $<%= Money.from_cents(@subtotal) %></h3>
 <br>
 <br>
-<h2>Billing Address</h2>
-<%= form_with do |f| %>
-  <%= f.text_area :billing_address_line1, placeholder: "Address line 1" %><br>
-  <%= f.text_area :billing_city, placeholder: "City" %>
-  <%= f.label :billing_state_province_label, "State", for: :billing_state_province %>
-  <%= f.select :billing_state_province, options_for_select(us_states), {} %><br>
-  <%= f.text_area :billing_zip, placeholder: "Zip/Postal Code" %>
-  <br>
-  <p>Save info for later?</p>
-  <%= f.check_box :billing_save %>
-<% end %>
-<label for="use-same">Use the same address for shipping?</label><input type=checkbox id="use-same" name="use-same" onchange="useSame()">
 <h2>Shipping Address</h2>
 
-<div id=shipping-address>
-  <%= form_with do |f| %>
-    <%= f.text_area :shipping_address_line1, placeholder: "Address line 1" %><br>
-    <%= f.text_area :shipping_city, placeholder: "City" %>
-    <%= f.label :billing_state_province_label, "State", for: :billing_state_province %>
-    <%= f.select :billing_state_province, options_for_select(us_states), {} %><br>
-    <%= f.text_area :shipping_zip, placeholder: "Zip/Postal Code" %>
-    <br>
-    <p>Save info for later?</p>
-    <%= f.check_box :shipping_save %>
-  <% end %>
-</div>
+<%= form_with do |f| %>
+  <%= f.text_area :shipping_address_line1, placeholder: "Address line 1" %><br>
+  <%= f.text_area :shipping_city, placeholder: "City" %>
+  <%= f.label :shipping_state_province_label, "State", for: :shipping_state_province %>
+  <%= f.select :shipping_state_province, options_for_select(us_states), {} %><br>
+  <%= f.text_area :shipping_zip, placeholder: "Zip/Postal Code" %>
+<% end %>
+<% if @use_billing.value == "true" %>
+  <label for="use-same">Use the same address for billing?</label>
+  <input type=checkbox id="use-same" name="use-same" onchange="useSame()">
+  <h2>Billing Address</h2>
+  <div class=same-usable>
+    <%= form_with do |f| %>
+      <%= f.text_area :billing_address_line1, placeholder: "Address line 1" %><br>
+      <%= f.text_area :billing_city, placeholder: "City" %>
+      <%= f.label :billing_state_province_label, "State", for: :billing_state_province %>
+      <%= f.select :billing_state_province, options_for_select(us_states), {} %><br>
+      <%= f.text_area :billing_zip, placeholder: "Zip/Postal Code" %>
+    <% end %>
+  </div>
+<% end %>
 
 <br>
 <br>

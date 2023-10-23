@@ -17,12 +17,14 @@ class ApplicationController < ActionController::Base
   end
 
   def orders
+    @use_billing = SitewideSetting.find_by(key: "use_billing_address")
   end
 
   def empty_cart_error
   end
 
   def checkout
+    @use_billing = SitewideSetting.find_by(key: "use_billing_address")
     @cart = current_user.cart
     if !@cart or @cart.products.length == 0
       redirect_to action: :empty_cart_error
@@ -30,16 +32,19 @@ class ApplicationController < ActionController::Base
   end
 
   def payment
+    @use_billing = SitewideSetting.find_by(key: "use_billing_address")
     @cart = current_user.cart
     @billing_address = current_user.addresses.where(address_type: :billing)
     @shipping_address = current_user.addresses.where(address_type: :shipping)
-    if !@cart or @cart.products.length == 0 or @billing_address.length == 0 or @shipping_address.length == 0
+    if !@cart or @cart.products.length == 0 or @shipping_address.length == 0 or (@use_billing.value == "true" and @billing_address.length == 0)
       redirect_to action: :empty_cart_error
     end
-    @billing_address = @billing_address.order("created_at").last
+    if @use_billing.value == "true"
+      @billing_address = @billing_address.order("created_at").last
+    end
     @shipping_address = @shipping_address.order("created_at").last
     @subtotal = calc_subtotal(@cart.products)
-    @tax = calc_tax_rate(@billing_address.state, @billing_address.city, @subtotal)
+    @tax = @use_billing.value == "true" ? calc_tax_rate(@billing_address.state, @billing_address.city, @subtotal) : 0
     @total = calc_total(@subtotal, @tax)
     @cart.total = @total
     @cart.save!

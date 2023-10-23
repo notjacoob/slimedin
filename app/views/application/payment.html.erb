@@ -13,7 +13,9 @@
 </ul>
 <hr>
 <h2>Payment info: </h2> <br>
-<h3>Billing address: <%= "#{@billing_address.line1}, #{@billing_address.city}, #{@billing_address.state} #{@billing_address.zip}" %></h3><br>
+<% if @use_billing.value == "true" %>
+  <h3>Billing address: <%= "#{@billing_address.line1}, #{@billing_address.city}, #{@billing_address.state} #{@billing_address.zip}" %></h3><br>
+<% end %>
 <h3>Shipping address: <%= "#{@shipping_address.line1}, #{@shipping_address.city}, #{@shipping_address.state} #{@shipping_address.zip}" %></h3><br>
 <hr>
 <h2>Amount: </h2><br>
@@ -27,7 +29,7 @@
 </ul>
 <h3>Currency: USD</h3>
 <h3>Subtotal: $<%= Money.from_cents(@subtotal) %></h3>
-<h3>Sales tax (<%= @billing_address.city %>, <%= @billing_address.state %>): $<%= Money.from_cents(@tax) %></h3>
+<h3>Sales tax<% if @use_billing.value == "true" %> (<%= @billing_address.city %>, <%= @billing_address.state %>)<% end %>: $<%= Money.from_cents(@tax) %></h3>
 <h3>Total: $<%= Money.from_cents(@total) %></h3>
 <hr>
 <br>
