@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_10_23_005116) do
+ActiveRecord::Schema[7.0].define(version: 2023_10_23_025642) do
   create_table "addresses", force: :cascade do |t|
     t.text "line1"
     t.text "city"
@@ -47,6 +47,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_23_005116) do
     t.text "products", default: "--- []\n"
     t.integer "billing_address_id"
     t.integer "shipping_address_id"
+    t.integer "status"
     t.index ["billing_address_id"], name: "index_orders_on_billing_address_id"
     t.index ["shipping_address_id"], name: "index_orders_on_shipping_address_id"
     t.index ["user_id"], name: "index_orders_on_user_id"

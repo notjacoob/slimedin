@@ -1,0 +1,96 @@
+<%= render 'application/navbar' %>
+<%= render 'navbar' %>
+<h1>Global Settings</h1>
+<br>
+<hr>
+
+<script type=module>
+  const updateSetting = (key) => {
+      fetch("/admin-portal/update-setting", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+              key: key,
+              value: document.getElementById("value-" + key + "_setting_value").value
+          })
+      }).then(() => {
+          const btn = $("#update-button-" + key)
+          btn.text("Saved!")
+          btn.addClass("savedbtn")
+          setTimeout(() => {
+              btn.text("Save")
+              btn.removeClass("savedbtn")
+          }, 3000)
+      })
+  }
+  const newSetting = () => {
+      const key = document.getElementById("key-new_key_new").value
+      const value = document.getElementById("value-new_value_new").value
+      console.log(`Key: ${key}, value: ${value}`)
+      fetch("/admin-portal/new-setting", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+              key: key,
+              value: value
+          })
+      }).then(() => {
+          location.reload()
+      })
+  }
+  const deleteSetting = (key) => {
+      fetch("/admin-portal/delete-setting", {
+          method: "DELETE",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+              key: key
+          })
+      }).then(() => {
+          location.reload()
+      })
+  }
+  window.updateSetting = updateSetting
+  window.newSetting = newSetting
+  window.deleteSetting = deleteSetting
+</script>
+<style>
+  .savedbtn {
+      background-color: limegreen;
+  }
+</style>
+
+<%= link_to "New Setting", "/admin-portal/global-settings?new_setting=true", method: :get %>
+
+<table border="1" cellpadding="10">
+  <thead>
+  <tr>
+    <th>Key</th>
+    <th>Value</th>
+    <th></th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+    <% SitewideSetting.all.each do |s| %>
+      <tr>
+        <td><%= s.key %></td>
+        <td><%= text_field "value-#{s.key}", :setting_value, :value => s.value %></td>
+        <td><%= button_tag "Save", {id: "update-button-#{s.key}", onclick: "updateSetting(\"#{s.key}\")"} %></td>
+        <td><%= button_tag "Delete", onclick: "deleteSetting(\"#{s.key}\")" %></td>
+      </tr>
+    <% end %>
+    <% if params[:new_setting] == "true" %>
+      <tr>
+        <td><%= text_field "key-new", :key_new %></td>
+        <td><%= text_field "value-new", :value_new %></td>
+        <td><%= button_tag "Save", {id: "update-button-new", onclick: "newSetting()"} %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

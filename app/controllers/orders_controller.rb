@@ -7,12 +7,10 @@ class OrdersController < ActionController::Base
 
 
   def create_order
-    params.permit(:cartId)
-    params.permit(:shippingId)
     @use_billing = SitewideSetting.find_by(key: "use_billing_address")
     if params[:pid] != ""
       @cart = Cart.where(id: params[:cartId]).first!
-      if (@use_billing.value = "true")
+      if @use_billing.value == "true"
         @billing_address=Address.find(params[:billingId])
       end
       @shipping_address=Address.find(params[:shippingId])
@@ -34,6 +32,7 @@ class OrdersController < ActionController::Base
         order = Order.new(products: @cart.products, user: current_user)
         order.price_cents = price
         order.shipping_address = @shipping_address
+        order.status = :submitted
         if (@use_billing.value = "true")
           order.billing_address = @billing_address
         end
@@ -115,7 +114,9 @@ class OrdersController < ActionController::Base
 
       @shipping_address.save!
     else
-      @billing_address = Address.find(params[:billing_address_id])
+      if @use_billing.value == "true"
+        @billing_address = Address.find(params[:billing_address_id])
+      end
       @shipping_address = Address.find(params[:shipping_address_id])
     end
     render({:json => "{\"shipping_id\": #{@shipping_address.id}, \"billing_id\": #{@use_billing.value == "true" ? @billing_address.id : -1}}"})
@@ -146,7 +147,7 @@ class OrdersController < ActionController::Base
         \"embeds\": [
             {
                 \"title\": \"New Order\",
-                \"url\": \"http://localhost:3000/orders\",
+                \"url\": \"http://localhost:3000/admin-portal/orders#order-table-#{order.id}\",
                 \"color\": 5814783,
                 \"fields\": [
                     {

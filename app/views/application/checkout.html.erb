@@ -55,9 +55,10 @@
                 <% else %>
                     type: "existing",
                     shipping_address_id: document.getElementById("shipping_address_id").value,
-                    billing_address_id: document.getElementById("billing_address_id").value
+                    <% if @use_billing.value == "true" %>
+                        billing_address_id: document.getElementById("billing_address_id").value
+                    <% end %>
                 <% end %>
-
             })
         }).then((data) => {
             const dj = data.json()

@@ -5,7 +5,7 @@
 <% if user_signed_in? %>
   <% if current_user.administrator %>
     <br>
-    <%= link_to "Add Products", {controller: :administrator, action: :add_products_get} %>
+    <%= link_to "Admin Portal", {controller: :administrator, action: :admin_portal} %>
   <% end %>
 <% end %>
 <br>

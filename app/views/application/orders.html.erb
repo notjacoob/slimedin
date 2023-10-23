@@ -38,5 +38,6 @@
     <% end %>
     <% @shipping_address = order.shipping_address %>
     <h3>Shipping Address: <%= @shipping_address.line1 %>, <%= @shipping_address.city %>, <%= @shipping_address.state %> <%= @shipping_address.zip %></h3>
+    <h4>Order status: <%= order.status %></h4>
   <% end %>
 <% end %>

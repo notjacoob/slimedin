@@ -24,7 +24,6 @@ class ApplicationController < ActionController::Base
   end
 
   def checkout
-    puts "AAAAAAAAAAAAA - #{params}"
     @use_billing = SitewideSetting.find_by(key: "use_billing_address")
     @new_address = (params[:new_address] != nil and params[:new_address] == "true")
     @cart = current_user.cart
