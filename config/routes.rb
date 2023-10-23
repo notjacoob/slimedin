@@ -32,6 +32,8 @@ Rails.application.routes.draw do
     post "admin-portal/update-setting", to: "administrator#update_setting"
     post "admin-portal/new-setting", to: "administrator#new_setting"
     delete "admin-portal/delete-setting", to: "administrator#delete_setting"
+    post "add-cart-qty/:pid", to: "orders#add_cart_qty"
+    post "remove-cart-qty/:pid", to: "orders#remove_cart_qty"
   end
 
   if Rails.env.development?

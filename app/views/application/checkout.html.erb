@@ -1,6 +1,4 @@
 <%= render 'navbar' %>
-<% @cart = current_user.cart %>
-<% @subtotal = 0 %>
 
 <script type=module>
     const useSame = () => {
@@ -77,12 +75,11 @@
 <h1>Checkout</h1><br>
 <h2>Cart</h2>
 <ul>
-  <% @cart.products.each do |pid| %>
+  <% current_user.current_cart.cart_products.each do |pid| %>
     <li>
-      <% @product = Product.find(pid) %>
-      <% @subtotal += @product.price_cents %>
-      <h3><%= @product.name %></h3>
-      <h4>$<%= Money.from_cents(@product.price_cents) %></h4>
+      <% @product = pid.product %>
+      <h3><%= @product.name %> x<%= pid.quantity %></h3>
+      <h4><%= Money.from_cents(@product.price_cents) %></h4>
     </li>
   <% end %>
 </ul>

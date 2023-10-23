@@ -29,17 +29,16 @@ class OrdersController < ActionController::Base
                                })
       begin
         response = @client.execute new_request
-        order = Order.new(products: @cart.products, user: current_user)
+        order = Order.new(user: current_user)
         order.price_cents = price
         order.shipping_address = @shipping_address
         order.status = :submitted
+        order.cart = @cart
         if (@use_billing.value = "true")
           order.billing_address = @billing_address
         end
         order.token = response.result.id
         if order.save! # I spent 30 minutes on this because I named the column plural instead of singular oh my god
-          @cart.products = []
-          @cart.save!
           return render :json => {:token => response.result.id}, :status => :ok
         else
         end
@@ -56,7 +55,15 @@ class OrdersController < ActionController::Base
       response = @client.execute request
       order = Order.find_by :token => params[:order_id]
       order.paid = response.result.status == 'COMPLETED'
-
+      @cart = order.cart
+      @cart.order = order
+      @cart.completed = true
+      @cart.save!
+      @new_cart = Cart.new
+      @new_cart.user = current_user
+      @new_cart.completed = false
+      @new_cart.total = 0
+      @new_cart.save!
       if order.save
         body = gen_discord_body(order)
         res = Net::HTTP.post(URI.parse(ENV["DISCORD_WEBHOOK"]), body, {"Content-Type": "application/json"})
@@ -68,23 +75,34 @@ class OrdersController < ActionController::Base
   end
 
   def add_cart
-    if current_user.cart != nil
-      @cart = current_user.cart
-      @cart.update_attribute :products, @cart.products.push(params[:pid])
-      @cart.save
+      @cart = current_user.current_cart
+      @product = Product.find(params[:pid])
+      @existing_product = @cart.cart_products.where(product: @product)
+      if @existing_product.length < 1
+        @new_product = CartProduct.new
+        @new_product.product = @product
+        @new_product.quantity = 1
+        @new_product.cart = @cart
+        @new_product.save!
+      else
+        @existing_product = @existing_product.first!
+        @existing_product.quantity += 1
+        @existing_product.save!
+      end
+      @cart.save!
       redirect_to controller: :application, action: :productsv2
-    else
-      @cart = Cart.new
-      @cart.user = current_user
-      @cart.update products: [params[:pid]]
-      @cart.save
-    end
   end
   def remove_cart
-    @cart = current_user.cart
-    @cart.update_attribute :products, remove_first(@cart.products, params[:pid])
-    @cart.save
-    redirect_to controller: :application, action: :cart
+    @cart = current_user.current_cart
+    @product = Product.find(params[:pid])
+    @cart_product = @cart.cart_products.where(product: @product).first!
+    if @cart_product.quantity > 1
+      @cart_product.quantity = @cart_product.quantity - 1
+      @cart_product.save!
+    else
+      @cart_product.delete
+    end
+    redirect_back(fallback_location: :root_path)
   end
   def payment_proceed
     @use_billing = SitewideSetting.find_by(key: "use_billing_address")
@@ -120,6 +138,27 @@ class OrdersController < ActionController::Base
       @shipping_address = Address.find(params[:shipping_address_id])
     end
     render({:json => "{\"shipping_id\": #{@shipping_address.id}, \"billing_id\": #{@use_billing.value == "true" ? @billing_address.id : -1}}"})
+  end
+
+  def add_cart_qty
+    @cart = current_user.current_cart
+    @product = Product.find(params[:pid])
+    @cart_product = @cart.cart_products.where(product: @product).first!
+    @cart_product.quantity = @cart_product.quantity + 1
+    @cart_product.save!
+    redirect_back(fallback_location: :root_path)
+  end
+  def remove_cart_qty
+    @cart = current_user.current_cart
+    @product = Product.find(params[:pid])
+    @cart_product = @cart.cart_products.where(product: @product).first!
+    if @cart_product.quantity > 1
+      @cart_product.quantity = @cart_product.quantity - 1
+      @cart_product.save!
+    else
+      @cart_product.delete
+    end
+    redirect_back(fallback_location: :root_path)
   end
 
   private
@@ -160,7 +199,7 @@ class OrdersController < ActionController::Base
                     },
                     {
                         \"name\": \"Item Count\",
-                        \"value\": \"#{order.products.length}\"
+                        \"value\": \"#{order.cart.cart_products.length}\"
                     },
                     {
                         \"name\": \"Order ID\",

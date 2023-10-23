@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_10_23_025642) do
+ActiveRecord::Schema[7.0].define(version: 2023_10_23_201743) do
   create_table "addresses", force: :cascade do |t|
     t.text "line1"
     t.text "city"
@@ -25,14 +25,22 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_23_025642) do
     t.index ["user_id"], name: "index_addresses_on_user_id"
   end
 
+  create_table "cart_products", force: :cascade do |t|
+    t.integer "product_id"
+    t.integer "cart_id"
+    t.integer "quantity"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cart_id"], name: "index_cart_products_on_cart_id"
+    t.index ["product_id"], name: "index_cart_products_on_product_id"
+  end
+
   create_table "carts", force: :cascade do |t|
     t.integer "user_id"
-    t.integer "order_id"
-    t.text "products", default: "--- []\n"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "total", default: 0
-    t.index ["order_id"], name: "index_carts_on_order_id"
+    t.boolean "completed"
     t.index ["user_id"], name: "index_carts_on_user_id"
   end
 
@@ -44,11 +52,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_23_025642) do
     t.integer "user_id"
     t.integer "price_cents", default: 0, null: false
     t.string "price_currency", default: "USD", null: false
-    t.text "products", default: "--- []\n"
     t.integer "billing_address_id"
     t.integer "shipping_address_id"
     t.integer "status"
+    t.integer "cart_id"
     t.index ["billing_address_id"], name: "index_orders_on_billing_address_id"
+    t.index ["cart_id"], name: "index_orders_on_cart_id"
     t.index ["shipping_address_id"], name: "index_orders_on_shipping_address_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end

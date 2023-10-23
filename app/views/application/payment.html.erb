@@ -2,12 +2,11 @@
 <h1>Payment</h1>
 <h2>Cart</h2>
 <ul>
-  <% @cart.products.each do |pid| %>
+  <% @cart.cart_products.each do |pid| %>
     <li>
-      <% @product = Product.find(pid) %>
-      <% @subtotal += @product.price_cents %>
-      <h3><%= @product.name %></h3>
-      <h4>$<%= Money.from_cents(@product.price_cents) %></h4>
+      <% @product = pid.product %>
+      <h3><%= @product.name %> x<%= pid.quantity %></h3>
+      <h4><%= Money.from_cents(@product.price_cents) %></h4>
     </li>
   <% end %>
 </ul>
@@ -21,10 +20,9 @@
 <h2>Amount: </h2><br>
 <ul>
   <% @subtotal = 0 %>
-  <% @cart.products.each do |pid| %>
-    <% @product = Product.where(id: pid).first! %>
-    <li><%= @product.name %> x1 - $<%= Money.from_cents(@product.price_cents) %></li>
-    <% @subtotal += @product.price_cents %>
+  <% @cart.cart_products.each do |pid| %>
+    <li><%= pid.product.name %> x<%= pid.quantity %> - $<%= Money.from_cents(pid.product.price_cents) * pid.quantity %></li>
+    <% @subtotal += pid.product.price_cents * pid.quantity %>
   <% end %>
 </ul>
 <h3>Currency: USD</h3>

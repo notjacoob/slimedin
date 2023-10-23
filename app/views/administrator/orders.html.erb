@@ -40,24 +40,26 @@
     <li id="order-table-<%= order.id %>">
       <hr>
       <h2><%= order.created_at.to_s.gsub!(" ", ", ") %> - ID: <%= order.id %> - USER: <%= order.user.email %></h2>
-      <table border="1">
+      <table border="1" cellpadding="15">
         <thead>
         <tr>
           <th>Product</th>
+          <th>Quantity</th>
           <th>Price</th>
           <th>Total</th>
         </tr>
         </thead>
         <tbody>
-        <% order.products.each do |p| %>
-          <% @product = Product.where(id: p).first! %>
+        <% order.cart.cart_products.each do |p| %>
           <tr>
-            <td><%= @product.name %></td>
-            <td>$<%= Money.from_cents(@product.price_cents) %></td>
+            <td><%= p.product.name %></td>
+            <td><%= p.quantity %></td>
+            <td>$<%= Money.from_cents(p.product.price_cents) * p.quantity %></td>
             <td></td>
           </tr>
         <% end %>
         <tr>
+          <td></td>
           <td></td>
           <td></td>
           <td><strong>$<%= Money.from_cents(order.price_cents) %></strong></td>

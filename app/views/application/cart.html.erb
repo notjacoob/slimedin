@@ -1,14 +1,15 @@
 <%= render "navbar" %>
 <%= link_to "Products", "/products" %>
 <h1>Cart</h1>
-<% if current_user.cart.products.length > 0 %>
+<% if @cart.cart_products.length > 0 %>
   <ul>
-    <% current_user.cart.products.each do |pid| %>
+    <% @cart.cart_products.each do |pid| %>
       <li>
-        <% @product = Product.find(pid) %>
-        <h3><%= @product.name %></h3>
+        <% @product = pid.product %>
+        <h3><%= @product.name %> x<%= pid.quantity %></h3>
         <h4><%= Money.from_cents(@product.price_cents) %></h4>
-        <%= button_to "Remove", controller: :orders, action: :remove_cart, pid: @product.id %>
+        <%= button_to "Add 1", controller: :orders, action: :add_cart_qty, pid: @product.id %>
+        <%= button_to "Remove 1", controller: :orders, action: :remove_cart_qty, pid: @product.id %>
       </li>
     <% end %>
   </ul>

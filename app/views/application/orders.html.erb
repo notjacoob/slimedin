@@ -7,24 +7,25 @@
 <% Order.where(:user_id => current_user.id).each do |order| %>
   <hr>
   <h2><%= order.created_at.to_s.gsub!(" ", ", ") %> - ID: <%= order.id %></h2>
-  <table border="1">
+  <table border="1" cellpadding="15">
     <thead>
       <tr>
         <th>Product</th>
+        <th>Quantity</th>
         <th>Price</th>
         <th>Total</th>
       </tr>
     </thead>
     <tbody>
-      <% order.products.each do |p| %>
-        <% @product = Product.where(id: p).first! %>
+      <% order.cart.cart_products.each do |c| %>
         <tr>
-          <td><%= @product.name %></td>
-          <td>$<%= Money.from_cents(@product.price_cents) %></td>
-          <td></td>
+          <td><%= c.product.name %></td>
+          <td><%= c.quantity %></td>
+          <td>$<%= Money.from_cents(c.product.price_cents * c.quantity) %></td>
         </tr>
       <% end %>
     <tr>
+      <td></td>
       <td></td>
       <td></td>
       <td><strong>$<%= Money.from_cents(order.price_cents) %></strong></td>

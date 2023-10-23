@@ -1,4 +1,5 @@
 class Cart < ApplicationRecord
   belongs_to :user
-  serialize :products, Array
+  has_many :cart_products
+  has_one :order
 end

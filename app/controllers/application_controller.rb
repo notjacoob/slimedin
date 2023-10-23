@@ -9,11 +9,7 @@ class ApplicationController < ActionController::Base
   end
 
   def cart
-    if current_user.cart == nil
-      @cart = Cart.new
-      @cart.user = current_user
-      @cart.save
-    end
+    @cart = current_user.cart.where(completed: false).order("created_AT DESC").last!
   end
 
   def orders
@@ -26,25 +22,28 @@ class ApplicationController < ActionController::Base
   def checkout
     @use_billing = SitewideSetting.find_by(key: "use_billing_address")
     @new_address = (params[:new_address] != nil and params[:new_address] == "true")
-    @cart = current_user.cart
-    if !@cart or @cart.products.length == 0
+    @cart = current_user.current_cart
+    @subtotal = 0
+    @cart.cart_products.each {|c| @subtotal = @subtotal + (c.product.price_cents * c.quantity)}
+    puts "AAAAAAAAAAAAAAAAAAAAAAA #{@subtotal}"
+    if !@cart or @cart.cart_products.length == 0
       redirect_to action: :empty_cart_error
     end
   end
 
   def payment
     @use_billing = SitewideSetting.find_by(key: "use_billing_address")
-    @cart = current_user.cart
+    @cart = current_user.current_cart
     @billing_address = current_user.addresses.where(address_type: :billing)
     @shipping_address = current_user.addresses.where(address_type: :shipping)
-    if !@cart or @cart.products.length == 0 or @shipping_address.length == 0 or (@use_billing.value == "true" and @billing_address.length == 0)
+    if !@cart or @cart.cart_products.length == 0 or @shipping_address.length == 0 or (@use_billing.value == "true" and @billing_address.length == 0)
       redirect_to action: :empty_cart_error
     end
     if @use_billing.value == "true" and params[:billingId]
       @billing_address = @billing_address.find(params[:billingId])
     end
     @shipping_address = @shipping_address.find(params[:shippingId])
-    @subtotal = calc_subtotal(@cart.products)
+    @subtotal = calc_subtotal(@cart.cart_products)
     @tax = @use_billing.value == "true" ? calc_tax_rate(@billing_address.state, @billing_address.city, @subtotal) : 0
     @total = calc_total(@subtotal, @tax)
     @cart.total = @total
@@ -63,7 +62,7 @@ class ApplicationController < ActionController::Base
   def calc_subtotal(products)
     subtotal = 0
     products.each do |p|
-      subtotal += Product.where(id: p).first!.price_cents
+      subtotal += p.product.price_cents * p.quantity
     end
     subtotal
   end

@@ -4,6 +4,10 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
   has_many :order
-  has_one :cart, required: false
+  has_many :cart
   has_many :addresses
+
+  def current_cart
+    cart.where(completed: false).order("created_at DESC").last!
+  end
 end
