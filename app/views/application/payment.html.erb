@@ -40,12 +40,18 @@
         env: "<%= ENV["PAYPAL_ENV"] %>",
         createOrder: async () => {
             const cartId = <%= @cart.id %>;
-                const response = await fetch(`/create-order/${cartId}`, {
+            let response
+            <% if @use_billing.value == "true" %>
+                response = await fetch(`/create-order/${cartId}/<%= @shipping_address.id %>/<%= @billing_address.id %>`, {
                     method: 'POST',
                 });
-                const responseData = await response.json();
-
-                return responseData.token;
+            <% else %>
+                response = await fetch(`/create-order/${cartId}/<%= @shipping_address.id %>`, {
+                    method: 'POST',
+                });
+            <% end %>
+            const responseData = await response.json();
+            return responseData.token;
         },
         onApprove: async(data) => {
             const response = await fetch ('/capture-order', {

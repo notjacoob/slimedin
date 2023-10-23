@@ -11,34 +11,63 @@
         }
     }
     $("#submit-order").on("click", e => {
-        <% if @use_billing == "true" %>
+        <% if @use_billing.value == "true" and @new_address %>
             const checked = document.getElementById("use-same").checked
         <% end %>
-        const shipping_address_line1 = document.getElementById("shipping_address_line1").value
-        const shipping_city = document.getElementById("shipping_city").value
-        const shipping_state_province = document.getElementById("shipping_state_province").value
-        const shipping_zip = document.getElementById("shipping_zip").value
+        let shipping_address_line1
+        let shipping_city
+        let shipping_state_province
+        let shipping_zip
+        let shipping_first_name
+        let shipping_last_name
+        <% if @new_address %>
+            shipping_address_line1 = document.getElementById("shipping_address_line1").value
+            shipping_city = document.getElementById("shipping_city").value
+            shipping_state_province = document.getElementById("shipping_state_province").value
+            shipping_zip  = document.getElementById("shipping_zip").value
+            shipping_first_name = document.getElementById("shipping_first_name").value
+            shipping_last_name = document.getElementById("shipping_last_name").value
+        <% end %>
         fetch("/payment-proceed", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
+                <% if @new_address %>
+                type: "new",
                 shipping_address: {
                     line1: shipping_address_line1,
                     city: shipping_city,
                     state_province: shipping_state_province,
-                    zip: shipping_zip
-                }<% if @use_billing == "true" %>,
+                    zip: shipping_zip,
+                    first_name: shipping_first_name,
+                    last_name: shipping_last_name
+                }<% if @use_billing.value == "true" %>,
                 billing_address: {
                     line1: checked ? shipping_address_line1 : document.getElementById("billing_address_line1").value,
                     city: checked ? shipping_city : document.getElementById("billing_city").value,
                     state_province: checked ? shipping_state_province : document.getElementById("billing_state_province").value,
                     zip: checked ? shipping_zip : document.getElementById("billing_zip").value,
-                }<% end %>
+                    first_name: checked ? shipping_first_name : document.getElementById("billing_first_name").value,
+                    last_name: checked ? shipping_last_name : document.getElementById("billing_last_name").value
+                },<% end %>
+                <% else %>
+                    type: "existing",
+                    shipping_address_id: document.getElementById("shipping_address_id").value,
+                    billing_address_id: document.getElementById("billing_address_id").value
+                <% end %>
+
             })
-        }).then(() => {
-            window.location.href = "<%= request.base_url %>" + "/payment"
+        }).then((data) => {
+            const dj = data.json()
+            dj.then(data2 => {
+                <% if @use_billing.value == "true" %>
+                window.location.href = `<%= request.base_url %>` + `/payment/${data2.shipping_id}/${data2.billing_id}/`
+                <% else %>
+                window.location.href = `<%= request.base_url %>` + `/payment/${data2.shipping_id}/`
+                <% end %>
+            })
         });
     });
     window.useSame = useSame
@@ -60,30 +89,44 @@
 <br>
 <br>
 <h2>Shipping Address</h2>
-
-<%= form_with do |f| %>
-  <%= f.text_area :shipping_address_line1, placeholder: "Address line 1" %><br>
-  <%= f.text_area :shipping_city, placeholder: "City" %>
-  <%= f.label :shipping_state_province_label, "State", for: :shipping_state_province %>
-  <%= f.select :shipping_state_province, options_for_select(us_states), {} %><br>
-  <%= f.text_area :shipping_zip, placeholder: "Zip/Postal Code" %>
-<% end %>
-<% if @use_billing.value == "true" %>
-  <label for="use-same">Use the same address for billing?</label>
-  <input type=checkbox id="use-same" name="use-same" onchange="useSame()">
-  <h2>Billing Address</h2>
-  <div class=same-usable>
+<% if !@new_address %>
+  <%= form_with do |f| %>
+    <%= f.collection_select :shipping_address_id, Address.where(user: current_user, address_type: :shipping), :id, :address_select, include_blank: true %>
+  <% end %>
+  <% if @use_billing.value == "true" %>
+    <h2>Billing Address</h2>
     <%= form_with do |f| %>
-      <%= f.text_area :billing_address_line1, placeholder: "Address line 1" %><br>
-      <%= f.text_area :billing_city, placeholder: "City" %>
-      <%= f.label :billing_state_province_label, "State", for: :billing_state_province %>
-      <%= f.select :billing_state_province, options_for_select(us_states), {} %><br>
-      <%= f.text_area :billing_zip, placeholder: "Zip/Postal Code" %>
+      <%= f.collection_select :billing_address_id, Address.where(user: current_user, address_type: :billing), :id, :address_select, include_blank: true %>
     <% end %>
-  </div>
+  <% end %>
+  <%= link_to "New Address#{@use_billing.value == "true" ? "es" : ""}", "/checkout?new_address=true", method: :get %>
+<% else %>
+  <%= form_with do |f| %>
+    <%= f.text_area :shipping_address_line1, placeholder: "Address line 1" %><br>
+    <%= f.text_area :shipping_city, placeholder: "City" %>
+    <%= f.label :shipping_state_province_label, "State", for: :shipping_state_province %>
+    <%= f.select :shipping_state_province, options_for_select(us_states), {} %><br>
+    <%= f.text_area :shipping_zip, placeholder: "Zip/Postal Code" %>
+    <%= f.text_area :shipping_first_name, placeholder: "First Name" %>
+    <%= f.text_area :shipping_last_name, placeholder: "Last Name" %>
+  <% end %>
+  <% if @use_billing.value == "true" %>
+    <label for="use-same">Use the same address for billing?</label>
+    <input type=checkbox id="use-same" name="use-same" onchange="useSame()">
+    <h2>Billing Address</h2>
+    <div class=same-usable>
+      <%= form_with do |f| %>
+        <%= f.text_area :billing_address_line1, placeholder: "Address line 1" %><br>
+        <%= f.text_area :billing_city, placeholder: "City" %>
+        <%= f.label :billing_state_province_label, "State", for: :billing_state_province %>
+        <%= f.select :billing_state_province, options_for_select(us_states), {} %><br>
+        <%= f.text_area :billing_zip, placeholder: "Zip/Postal Code" %>
+        <%= f.text_area :billing_first_name, placeholder: "First Name" %>
+        <%= f.text_area :billing_last_name, placeholder: "Last Name" %>
+      <% end %>
+    </div>
 <% end %>
-
+<% end %>
 <br>
 <br>
 <button id="submit-order">Proceed to payment</button>
-

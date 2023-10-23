@@ -24,7 +24,9 @@ class ApplicationController < ActionController::Base
   end
 
   def checkout
+    puts "AAAAAAAAAAAAA - #{params}"
     @use_billing = SitewideSetting.find_by(key: "use_billing_address")
+    @new_address = (params[:new_address] != nil and params[:new_address] == "true")
     @cart = current_user.cart
     if !@cart or @cart.products.length == 0
       redirect_to action: :empty_cart_error
@@ -39,10 +41,10 @@ class ApplicationController < ActionController::Base
     if !@cart or @cart.products.length == 0 or @shipping_address.length == 0 or (@use_billing.value == "true" and @billing_address.length == 0)
       redirect_to action: :empty_cart_error
     end
-    if @use_billing.value == "true"
-      @billing_address = @billing_address.order("created_at").last
+    if @use_billing.value == "true" and params[:billingId]
+      @billing_address = @billing_address.find(params[:billingId])
     end
-    @shipping_address = @shipping_address.order("created_at").last
+    @shipping_address = @shipping_address.find(params[:shippingId])
     @subtotal = calc_subtotal(@cart.products)
     @tax = @use_billing.value == "true" ? calc_tax_rate(@billing_address.state, @billing_address.city, @subtotal) : 0
     @total = calc_total(@subtotal, @tax)

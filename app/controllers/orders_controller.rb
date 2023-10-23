@@ -8,13 +8,14 @@ class OrdersController < ActionController::Base
 
   def create_order
     params.permit(:cartId)
+    params.permit(:shippingId)
     @use_billing = SitewideSetting.find_by(key: "use_billing_address")
     if params[:pid] != ""
       @cart = Cart.where(id: params[:cartId]).first!
       if (@use_billing.value = "true")
-        @billing_address=Address.where(user: current_user, address_type: :billing).order("created_at").last
+        @billing_address=Address.find(params[:billingId])
       end
-      @shipping_address=Address.where(user: current_user, address_type: :shipping).order("created_at").last
+      @shipping_address=Address.find(params[:shippingId])
       price = @cart.total
       new_request = PayPalCheckoutSdk::Orders::OrdersCreateRequest::new
       new_request.request_body({
@@ -87,27 +88,37 @@ class OrdersController < ActionController::Base
     redirect_to controller: :application, action: :cart
   end
   def payment_proceed
-    @use_billing = SitewideSetting["use_billing_address"]
-    if @use_billing.value == "true"
-      @billing_address = Address.new
-      @billing_address.line1 = params[:billing_address][:line1]
-      @billing_address.city = params[:billing_address][:city]
-      @billing_address.state = params[:billing_address][:state_province]
-      @billing_address.zip = params[:billing_address][:zip]
-      @billing_address.address_type = :billing
-      @billing_address.user = current_user
-      @billing_address.save!
+    @use_billing = SitewideSetting.find_by(key: "use_billing_address")
+    if params[:type] == "new"
+      if @use_billing.value == "true"
+        @billing_address = Address.new
+        @billing_address.line1 = params[:billing_address][:line1]
+        @billing_address.city = params[:billing_address][:city]
+        @billing_address.state = params[:billing_address][:state_province]
+        @billing_address.zip = params[:billing_address][:zip]
+        @billing_address.first_name = params[:billing_address][:first_name]
+        @billing_address.last_name = params[:billing_address][:last_name]
+        @billing_address.address_type = :billing
+        @billing_address.user = current_user
+        @billing_address.save!
+      end
+
+      @shipping_address = Address.new
+      @shipping_address.line1 = params[:shipping_address][:line1]
+      @shipping_address.city = params[:shipping_address][:city]
+      @shipping_address.state = params[:shipping_address][:state_province]
+      @shipping_address.zip = params[:shipping_address][:zip]
+      @shipping_address.first_name = params[:shipping_address][:first_name]
+      @shipping_address.last_name = params[:shipping_address][:last_name]
+      @shipping_address.address_type = :shipping
+      @shipping_address.user = current_user
+
+      @shipping_address.save!
+    else
+      @billing_address = Address.find(params[:billing_address_id])
+      @shipping_address = Address.find(params[:shipping_address_id])
     end
-
-    @shipping_address = Address.new
-    @shipping_address.line1 = params[:shipping_address][:line1]
-    @shipping_address.city = params[:shipping_address][:city]
-    @shipping_address.state = params[:shipping_address][:state_province]
-    @shipping_address.zip = params[:shipping_address][:zip]
-    @shipping_address.address_type = :shipping
-    @shipping_address.user = current_user
-
-    @shipping_address.save!
+    render({:json => "{\"shipping_id\": #{@shipping_address.id}, \"billing_id\": #{@use_billing.value == "true" ? @billing_address.id : -1}}"})
   end
 
   private

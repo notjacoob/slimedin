@@ -9,7 +9,8 @@ Rails.application.routes.draw do
     root to: "application#index"
     get "sign-in", to: "devise/sessions#new"
     get "sign-up", to: "devise/registrations#new"
-    post "create-order/:cartId", :to => "orders#create_order"
+    post "create-order/:cartId/:shippingId", :to => "orders#create_order"
+    post "create-order/:cartId/:shippingId/:billingId", :to => "orders#create_order"
     post "capture-order", :to => "orders#capture_order"
     get "add_products", :to => "administrator#add_products_get"
     post "add_products", :to => "administrator#add_products_post"
@@ -21,7 +22,8 @@ Rails.application.routes.draw do
     post "remove-cart/:pid", to: "orders#remove_cart"
     get "checkout", to: "application#checkout"
     post "payment-proceed", to: "orders#payment_proceed"
-    get "payment", to: "application#payment"
+    get "payment/:shippingId", to: "application#payment"
+    get "payment/:shippingId/:billingId", to: "application#payment"
     get "empty-cart", to: "application#empty_cart_error"
   end
 
