@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_10_26_035614) do
+ActiveRecord::Schema[7.0].define(version: 2023_10_26_064809) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -70,6 +70,20 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_26_035614) do
     t.integer "total", default: 0
     t.boolean "completed"
     t.index ["user_id"], name: "index_carts_on_user_id"
+  end
+
+  create_table "mailing_list_users", force: :cascade do |t|
+    t.integer "mailing_list_id"
+    t.text "email"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["mailing_list_id"], name: "index_mailing_list_users_on_mailing_list_id"
+  end
+
+  create_table "mailing_lists", force: :cascade do |t|
+    t.text "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "orders", force: :cascade do |t|

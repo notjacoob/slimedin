@@ -28,6 +28,7 @@ Rails.application.routes.draw do
     get "empty-cart", to: "application#empty_cart_error"
     post "add-cart-qty/:pid", to: "orders#add_cart_qty"
     post "remove-cart-qty/:pid", to: "orders#remove_cart_qty"
+    post "test-email", to: "application#test_email"
 
     get "admin-portal", to: "administrator#admin_portal"
     scope "admin-portal" do
@@ -37,6 +38,14 @@ Rails.application.routes.draw do
       post "new-setting", to: "administrator#new_setting"
       get "global-settings", to: "administrator#sitewide_settings"
       post "update-order-status", to: "administrator#update_order_status"
+
+      post "add-user-mailing", to: "administrator#add_user_mailing_post"
+      get "mailing-lists", to: "administrator#mailing_lists"
+      put "mailing-lists", to: "administrator#new_mailing_list"
+      post "mailing-lists", to: "administrator#add_user_mailing_post"
+      delete "mailing-lists", to: "administrator#remove_user_mailing_list"
+
+      delete "delete-mailing-list", to: "administrator#delete_mailing_list"
 
       get "add-products", to: "administrator#add_products"
       post "add-products", to: "administrator#add_products_post"

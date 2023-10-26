@@ -1,0 +1,12 @@
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv="content-type"/>
+  </head>
+  <body>
+    <h1>Welcome to slimedin.com, <%= @user.email %>!</h1>
+    <p>We appreciate you taking the time to explore our website!
+      Be sure to take a look at our <a href="<%= url_for controller: :application, action: :products %>">products</a>,
+      and don't forget to check out your (TODO)[loyalty] account!
+    </p>
+  </body>
+</html>

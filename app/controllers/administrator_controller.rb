@@ -11,7 +11,37 @@ class AdministratorController < ApplicationController
     redirect_to(controller: :administrator, action: :add_products)
   end
 
+  def delete_mailing_list
+    @list = MailingList.find(params[:list])
+    @list.delete
+    redirect_to(action: :mailing_lists)
+  end
+
   def add_products
+  end
+
+  def mailing_lists
+  end
+  def new_mailing_list
+    @name = params[:name]
+    @ml = MailingList.new
+    @ml.name = @name
+    @ml.save
+    redirect_to(action: :mailing_lists)
+  end
+
+  def add_user_mailing_post
+    @mu = MailingListUser.new
+    @mu.mailing_list = MailingList.find(params[:mailing_list_id])
+    @mu.email = params[:email]
+    @mu.save!
+    redirect_to(action: :mailing_lists)
+  end
+
+  def remove_user_mailing_list
+    @mu = MailingListUser.find(params[:user])
+    @mu.delete
+    redirect_back(fallback_location: :root_path)
   end
 
   def add_products_update

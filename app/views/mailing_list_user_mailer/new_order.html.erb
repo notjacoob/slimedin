@@ -1,0 +1,36 @@
+<html>
+  <body>
+    <h1>New order created!</h1>
+    <table border="1" cellpadding="15">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th>Quantity</th>
+          <th>Price</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @order.cart.cart_products.each do |p| %>
+          <tr>
+            <td><%= p.product.name %></td>
+            <td><%= p.quantity %></td>
+            <td><%= Money.from_cents(p.product.price_cents * p.quantity) %></td>
+            <td></td>
+          </tr>
+        <% end %>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><%= Money.from_cents(@order.price_cents) %></td>
+      </tr>
+      </tbody>
+    </table>
+    <h2><strong>Client: </strong><%= @order.user.email %></h2>
+    <% if @admin %>
+      <h2><a href="<%= url_for controller: :administrator, action: :orders %>#order-table-<%= @order.id %>">View the order in the portal</a></h2>
+    <% end %>
+    <h6>Created at: <%= @order.created_at %></h6>
+  </body>
+</html>

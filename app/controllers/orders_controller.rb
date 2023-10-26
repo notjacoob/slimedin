@@ -65,8 +65,8 @@ class OrdersController < ActionController::Base
       @new_cart.total = 0
       @new_cart.save!
       if order.save
-        body = gen_discord_body(order)
-        res = Net::HTTP.post(URI.parse(ENV["DISCORD_WEBHOOK"]), body, {"Content-Type": "application/json"})
+        send_discord_notif(order)
+        send_emails(order)
         return render :json => {:status => response.result.status, :order => order.id}, :status => :ok
       end
     rescue PayPalHttp::HttpError => ioe
@@ -167,6 +167,19 @@ class OrdersController < ActionController::Base
     client_secret = ENV["PAYPAL_CLIENT_SECRET"]
     environment = PayPal::SandboxEnvironment.new client_id, client_secret
     @client = PayPal::PayPalHttpClient.new environment
+  end
+  def send_discord_notif(order)
+    body = gen_discord_body(order)
+    res = Net::HTTP.post(URI.parse(ENV["DISCORD_WEBHOOK"]), body, {"Content-Type": "application/json"})
+  end
+  def send_emails(order)
+    MailingListUserMailer.with(user: order.user, order: order).new_order_client.deliver_later
+      mailing_list = MailingList.where(name: Rails.env == "development" ? "new orders dev" : "new orders")
+      if mailing_list.length > 0
+        mailing_list.first!.mailing_list_users.all.each do |mu|
+          MailingListUserMailer.with(user: mu, order: order, admin: true).new_order.deliver_later
+      end
+    end
   end
   def remove_first(array, item)
     newarray = []

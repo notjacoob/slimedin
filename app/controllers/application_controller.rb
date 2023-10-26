@@ -14,8 +14,12 @@ class ApplicationController < ActionController::Base
     @product = nil
   end
 
+  def test_email
+    UserMailer.with(user: current_user).test_email.deliver_later
+  end
+
   def cart
-    @cart = current_user.cart.where(completed: false).order("created_AT DESC").last!
+    @cart = current_user.current_cart
   end
 
   def orders

@@ -1,0 +1,8 @@
+<%= render 'application/navbar' %>
+<%= render 'navbar' %>
+<h1>Add email to mailing list</h1>
+<%= form_with do |f| %>
+  <%= f.collection_select :mailing_list_id, MailingList.all, :id, :name, prompt: true %>
+  <%= f.text_field :email, placeholder: "Email" %>
+  <%= f.submit %>
+<% end %>
