@@ -16,24 +16,33 @@ Rails.application.routes.draw do
     post "add_products", :to => "administrator#add_products_post"
     get "orders", to: "application#orders"
     get "order_success/:pid", to: "application#order_success"
-    get "products", to: "application#productsv2"
+    get "products", to: "application#products"
+    get "product/:pid", to: "application#product"
     post "add-cart/:pid", to: "orders#add_cart"
     get "cart", to: "application#cart"
     post "remove-cart/:pid", to: "orders#remove_cart"
     get "checkout", to: "application#checkout"
     post "payment-proceed", to: "orders#payment_proceed"
     get "payment/:shippingId", to: "application#payment"
-    get "admin-portal/orders", to: "administrator#orders"
-    post "admin-portal/update-order-status", to: "administrator#update_order_status"
     get "payment/:shippingId/:billingId", to: "application#payment"
     get "empty-cart", to: "application#empty_cart_error"
-    get "admin-portal", to: "administrator#admin_portal"
-    get "admin-portal/global-settings", to: "administrator#sitewide_settings"
-    post "admin-portal/update-setting", to: "administrator#update_setting"
-    post "admin-portal/new-setting", to: "administrator#new_setting"
-    delete "admin-portal/delete-setting", to: "administrator#delete_setting"
     post "add-cart-qty/:pid", to: "orders#add_cart_qty"
     post "remove-cart-qty/:pid", to: "orders#remove_cart_qty"
+
+    get "admin-portal", to: "administrator#admin_portal"
+    scope "admin-portal" do
+      get "orders", to: "administrator#orders"
+      delete "delete-setting", to: "administrator#delete_setting"
+      post "update-setting", to: "administrator#update_setting"
+      post "new-setting", to: "administrator#new_setting"
+      get "global-settings", to: "administrator#sitewide_settings"
+      post "update-order-status", to: "administrator#update_order_status"
+
+      get "add-products", to: "administrator#add_products"
+      post "add-products", to: "administrator#add_products_post"
+      put "add-products", to: "administrator#add_products_update"
+      post "change-product-listing", to: "administrator#change_product_listing"
+    end
   end
 
   if Rails.env.development?

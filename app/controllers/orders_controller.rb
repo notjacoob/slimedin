@@ -90,7 +90,7 @@ class OrdersController < ActionController::Base
         @existing_product.save!
       end
       @cart.save!
-      redirect_to controller: :application, action: :productsv2
+      redirect_to controller: :application, action: :cart
   end
   def remove_cart
     @cart = current_user.current_cart

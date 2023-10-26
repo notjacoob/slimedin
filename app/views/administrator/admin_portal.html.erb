@@ -1,7 +1,7 @@
 <%= render "application/navbar" %>
 <h1>Admin Portal</h1>
 <ul>
-  <li><h3><%= link_to "Add Products", {controller: :administrator, action: :add_products_get} %></h3></li>
+  <li><h3><%= link_to "Add Products", {controller: :administrator, action: :add_products} %></h3></li>
   <li><h3><%= link_to "View All Orders", {controller: :administrator, action: :orders} %></h3></li>
   <li><h3><%= link_to "Global Settings", {controller: :administrator, action: :sitewide_settings} %></h3></li>
 </ul>

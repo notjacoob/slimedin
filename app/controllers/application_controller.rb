@@ -5,7 +5,13 @@ class ApplicationController < ActionController::Base
   def index
   end
 
-  def productsv2
+  def products
+  end
+
+  def product
+    @product = Product.find(params[:pid])
+  rescue
+    @product = nil
   end
 
   def cart

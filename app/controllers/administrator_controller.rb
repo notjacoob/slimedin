@@ -1,19 +1,36 @@
 class AdministratorController < ApplicationController
   before_action :authenticate_user!, :user_admin?, except: [:set_admin]
   skip_before_action :verify_authenticity_token
-  def add_products_get
-  end
   def add_products_post
-    params.permit(:name).permit(:price_cents)
     @product = Product.new
     @product.name = params[:name]
+    @product.description = params[:description]
+    @product.thumbnail.attach params[:thumbnail]
     @product.price_cents = params[:price_cents]
-    @product.price_currency = "USD"
-    if @product.save
-      render html: "<h1>Success! Product created.</h1>".html_safe
-    else
-      render html: "<h1>There was a problem creating the product!</h1>".html_safe
+    @product.save!
+    redirect_to(controller: :administrator, action: :add_products)
+  end
+
+  def add_products
+  end
+
+  def add_products_update
+    @product = Product.find(params[:id])
+    @product.name = params[:name]
+    @product.description = params[:description]
+    if params[:thumbnail]
+      @product.thumbnail.attach params[:thumbnail]
     end
+    @product.price_cents = params[:price_cents]
+    @product.save!
+    redirect_to(controller: :administrator, action: :add_products)
+  end
+
+  def change_product_listing
+    @product = Product.find(params[:id])
+    @product.listed = !@product.listed
+    @product.save!
+    redirect_back(fallback_location: root_url)
   end
 
   def new_setting
