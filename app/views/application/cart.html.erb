@@ -1,21 +1,40 @@
-<%= render "navbar" %>
-<%= link_to "Products", "/products" %>
-<h1>Cart</h1>
+<%= stylesheet_link_tag "cart" %>
+
+<div class="navbar">
+  <div>
+    <%= render "navbar" %>
+    <%= link_to "Products", "/products" %>
+  </div>
+  <h1>Cart</h1>
+</div>
+<hr/>
+
+
 <% if @cart.cart_products.length > 0 %>
-  <ul>
+  <ul class="products">
     <% @cart.cart_products.each do |pid| %>
       <li>
         <% @product = pid.product %>
-        <h3><%= @product.name %> x<%= pid.quantity %></h3>
-        <h4><%= Money.from_cents(@product.price_cents) %></h4>
-        <%= button_to "Add 1", controller: :orders, action: :add_cart_qty, pid: @product.id %>
-        <%= button_to "Remove 1", controller: :orders, action: :remove_cart_qty, pid: @product.id %>
+        <img src="<%= @product.thumbnail.attached ? url_for(@product.thumbnail) : "/slime.jpg" %>" alt="">
+        <div class="product-name">
+          <%= @product.name %>
+        </div>
+        <div class="quantity-counter">
+          <%= button_to "+", {controller: :orders, action: :add_cart_qty, pid: @product.id}, {class: "inc"}%>
+          <input id=counter-value class="value" type=number value=<%= pid.quantity %>>
+          <%= button_to "-", { controller: :orders, action: :remove_cart_qty, pid: @product.id }, { class: "inc" } %>
+        </div>
+        <div class="product-price">
+          $<%= Money.from_cents(@product.price_cents) %>
+        </div>
       </li>
     <% end %>
   </ul>
   <br>
   <br>
-  <%= button_to "Checkout", {controller: :application, action: :checkout}, {:method => :get} %>
+  <div id=checkout-container>
+    <%= button_to "Checkout", {controller: :application, action: :checkout}, {:method => :get, class: "styled-btn"} %>
+  </div>
 <% else %>
   <h2>Your cart is empty!</h2>
 <% end %>

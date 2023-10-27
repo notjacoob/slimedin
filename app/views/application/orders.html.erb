@@ -1,8 +1,10 @@
-<%= render 'navbar' %>
-<h1>Orders</h1>
-<p>Currently signed in as: <%= current_user.email %></p>
-
-<br>
+<div class="navbar">
+  <div>
+    <%= render 'navbar' %>
+    <p>Currently signed in as: <%= current_user.email %></p>
+  </div>
+  <h1>Orders</h1>
+</div>
 
 <% Order.where(:user_id => current_user.id).each do |order| %>
   <hr>

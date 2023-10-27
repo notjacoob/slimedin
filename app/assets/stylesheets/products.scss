@@ -1,7 +1,24 @@
 .products {
-  display: grid;
+  display: flex;
+  gap: 30px;
+  margin: 20px;
+}
+.product {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5px;
+  border: 2px solid black;
+  border-radius: 10px;
+  box-shadow: 2px 2px 2px black;
 }
 .product img {
-  max-height: 250px;
-  max-width: 250px;
+  height: 200px;
+  width: 200px;
+}
+.product a {
+  text-decoration: none;
+  font-weight: bold;
+  color: dodgerblue;
+  text-shadow: 1px 1px black;
 }

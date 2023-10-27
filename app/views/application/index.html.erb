@@ -1,26 +1,30 @@
-<h1>Slimed In</h1>
-<h2>Navigation</h2>
-<%= link_to "Products", {controller: :application, action: :products} %>
-<br>
-<% if user_signed_in? %>
-  <% if current_user.administrator %>
-    <br>
-    <%= link_to "Admin Portal", {controller: :administrator, action: :admin_portal} %>
+<%= stylesheet_link_tag "index" %>
+<div class="header">
+  <% if user_signed_in? %>
+    <p id="current_user">Current user: <%= current_user.email %></p>
   <% end %>
+  <h1>Slimed In</h1>
+</div>
+<hr/>
+<div class="home-navbar">
+  <%= link_to "Products", {controller: :application, action: :products}, {class: "styled-btn"} %>
+  <% if user_signed_in? %>
+    <% if current_user.administrator %>
+      <%= link_to "Admin Portal", {controller: :administrator, action: :admin_portal}, {class: "styled-btn"} %>
+    <% end %>
+  <% end %>
+
+  <% if user_signed_in? %>
+    <%= link_to "Logout", destroy_user_session_path, {method: :delete, class: "styled-btn"} %>
+<% else %>
+    <%= link_to "Sign Up", "/sign-up", {class: "styled-btn"} %>
+    <%= link_to "Sign In", "/sign-in", {class: "styled-btn"} %>
 <% end %>
-<br>
-<br>
-<h2>User</h2>
-<%= link_to "Sign Up", "/sign-up" %>
-<br>
-<%= link_to "Sign In", "/sign-in" %>
-<br>
-<% if user_signed_in? %>
-  <%= link_to "Orders", "/orders" %>
-  <br>
-  <%= link_to "Cart", "/cart" %>
-  <br>
-  <br>
-  <%= button_to "logout", destroy_user_session_path, method: :delete %>
-  <p>Current user: <%= current_user.email %></p>
-<% end %>
+</div>
+<hr/>
+<div class="center">
+  <% if user_signed_in? %>
+    <%= link_to "Orders", "/orders", {class: "styled-btn"} %>
+    <%= link_to "Cart", "/cart", {class: "styled-btn"} %>
+  <% end %>
+</div>

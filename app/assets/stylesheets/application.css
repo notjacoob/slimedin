@@ -1,15 +1,48 @@
-/*
- * This is a manifest file that'll be compiled into application.css, which will include all the files
- * listed below.
- *
- * Any CSS (and SCSS, if configured) file within this directory, lib/assets/stylesheets, or any plugin's
- * vendor/assets/stylesheets directory can be referenced here using a relative path.
- *
- * You're free to add application-wide styles to this file and they'll appear at the bottom of the
- * compiled file so the styles you add here take precedence over styles defined in any other CSS
- * files in this directory. Styles in this file should be added after the last require_* statement.
- * It is generally better to create a new file per style scope.
- *
- *= require_tree .
- *= require_self
- */
+@import url('https://fonts.googleapis.com/css2?family=Gabarito&display=swap');
+
+body {
+    font-family: 'Gabarito', sans-serif;
+}
+.styled-btn {
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 1px 1px 1px black;
+    background-color: white;
+    border: 1px solid rgba(100, 100, 100, 0.5);
+    padding: 12px;
+    transition: box-shadow 250ms;
+    color: dodgerblue;
+}
+.styled-btn:hover {
+    box-shadow: 3px 3px 3px black;
+    transition: box-shadow 250ms;
+}
+.navbar {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 10px;
+}
+.navbar a {
+    text-decoration: none;
+    font-weight: bold;
+    color: dodgerblue;
+    text-shadow: 1px 1px black;
+}
+.navbar div {
+    position: absolute;
+    left: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin-left: 5px;
+}
+.navbar h1 {
+    justify-self: center;
+    flex-grow: 1;
+    text-align: center;
+    margin: -5px
+}

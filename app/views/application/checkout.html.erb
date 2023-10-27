@@ -1,4 +1,15 @@
-<%= render 'navbar' %>
+<%= stylesheet_link_tag "cart" %>
+<%= stylesheet_link_tag "checkout" %>
+
+<div class="navbar">
+  <div>
+    <%= render 'navbar' %>
+    <%= link_to "cart", "/cart" %>
+  </div>
+  <h1>Checkout</h1><br>
+</div>
+
+<hr/>
 
 <script type=module>
     const useSame = () => {
@@ -72,59 +83,91 @@
     window.useSame = useSame
 </script>
 
-<h1>Checkout</h1><br>
 <h2>Cart</h2>
-<ul>
+<ul class="products">
   <% current_user.current_cart.cart_products.each do |pid| %>
     <li>
       <% @product = pid.product %>
-      <h3><%= @product.name %> x<%= pid.quantity %></h3>
-      <h4><%= Money.from_cents(@product.price_cents) %></h4>
+      <img src="<%= @product.thumbnail.attached ? url_for(@product.thumbnail) : "/slime.jpg" %>" alt="">
+      <div class="product-name">
+        <%= @product.name %> x<%= pid.quantity %>
+      </div>
+      <div class="product-price">
+        $<%= Money.from_cents(@product.price_cents) %> * <%= pid.quantity %>
+      </div>
     </li>
   <% end %>
 </ul>
-<h3>Subtotal: $<%= Money.from_cents(@subtotal) %></h3>
-<br>
-<br>
-<h2>Shipping Address</h2>
-<% if !@new_address %>
-  <%= form_with do |f| %>
-    <%= f.collection_select :shipping_address_id, Address.where(user: current_user, address_type: :shipping), :id, :address_select, include_blank: true %>
-  <% end %>
-  <% if @use_billing.value == "true" %>
-    <h2>Billing Address</h2>
-    <%= form_with do |f| %>
-      <%= f.collection_select :billing_address_id, Address.where(user: current_user, address_type: :billing), :id, :address_select, include_blank: true %>
+<div class="info-block">
+  <h3>Price:</h3>
+  <ul>
+    <% current_user.current_cart.cart_products.each do |pid| %>
+      <li>
+        <% @product = pid.product %>
+        $<%= Money.from_cents(@product.price_cents) %> * <%= pid.quantity %> = $<%= Money.from_cents(@product.price_cents*pid.quantity) %>
+      </li>
     <% end %>
-  <% end %>
-  <%= link_to "New Address#{@use_billing.value == "true" ? "es" : ""}", "/checkout?new_address=true", method: :get %>
-<% else %>
-  <%= form_with do |f| %>
-    <%= f.text_area :shipping_address_line1, placeholder: "Address line 1" %><br>
-    <%= f.text_area :shipping_city, placeholder: "City" %>
-    <%= f.label :shipping_state_province_label, "State", for: :shipping_state_province %>
-    <%= f.select :shipping_state_province, options_for_select(us_states), {} %><br>
-    <%= f.text_area :shipping_zip, placeholder: "Zip/Postal Code" %>
-    <%= f.text_area :shipping_first_name, placeholder: "First Name" %>
-    <%= f.text_area :shipping_last_name, placeholder: "Last Name" %>
-  <% end %>
-  <% if @use_billing.value == "true" %>
-    <label for="use-same">Use the same address for billing?</label>
-    <input type=checkbox id="use-same" name="use-same" onchange="useSame()">
-    <h2>Billing Address</h2>
-    <div class=same-usable>
+  </ul>
+  <h3>Subtotal: $<%= Money.from_cents(@subtotal) %></h3>
+</div>
+<div id=addresses>
+  <h2>Shipping Address</h2>
+  <% if !@new_address and Address.where(user: current_user, address_type: :shipping).length > 0 and (!@use_billing.value == "true" or Address.where(user: current_user, address_type: :billing).length > 0) %>
+    <%= form_with do |f| %>
+      <%= f.collection_select :shipping_address_id, Address.where(user: current_user, address_type: :shipping), :id, :address_select, include_blank: true %>
+    <% end %>
+    <% if @use_billing.value == "true" %>
+      <h2>Billing Address</h2>
       <%= form_with do |f| %>
-        <%= f.text_area :billing_address_line1, placeholder: "Address line 1" %><br>
-        <%= f.text_area :billing_city, placeholder: "City" %>
-        <%= f.label :billing_state_province_label, "State", for: :billing_state_province %>
-        <%= f.select :billing_state_province, options_for_select(us_states), {} %><br>
-        <%= f.text_area :billing_zip, placeholder: "Zip/Postal Code" %>
-        <%= f.text_area :billing_first_name, placeholder: "First Name" %>
-        <%= f.text_area :billing_last_name, placeholder: "Last Name" %>
+        <%= f.collection_select :billing_address_id, Address.where(user: current_user, address_type: :billing), :id, :address_select, include_blank: true %>
       <% end %>
-    </div>
+    <% end %>
+    <h4>or</h4>
+    <%= link_to "New Address#{@use_billing.value == "true" ? "es" : ""}", "/checkout?new_address=true", method: :get %>
+  <% else %>
+    <%= form_with class: "new-adr-form" do |f| %>
+      <div class="fields">
+        <div class="form-dbl">
+          <%= f.text_area :shipping_address_line1, placeholder: "Address line 1" %>
+          <%= f.text_area :shipping_city, placeholder: "City" %>
+        </div>
+        <%= f.text_area :shipping_zip, placeholder: "Zip/Postal Code" %>
+        <div class="form-dbl">
+          <%= f.text_area :shipping_first_name, placeholder: "First Name" %>
+          <%= f.text_area :shipping_last_name, placeholder: "Last Name" %>
+        </div>
+        <div class="form-dbl">
+          <%= f.label :shipping_state_province_label, "State", for: :shipping_state_province %>
+          <%= f.select :shipping_state_province, options_for_select(us_states), {} %>
+        </div>
+      </div>
 <% end %>
-<% end %>
-<br>
-<br>
-<button id="submit-order">Proceed to payment</button>
+    <% if @use_billing.value == "true" %>
+      <h2>Billing Address</h2>
+      <div class="form-dbl">
+        <label for="use-same">Use the same address for billing?</label>
+        <input type=checkbox id="use-same" name="use-same" onchange="useSame()">
+      </div>
+        <%= form_with class: "new-adr-form" do |f| %>
+          <div class="fields same-usable">
+            <div class="form-dbl">
+              <%= f.text_area :billing_address_line1, placeholder: "Address line 1" %><br>
+              <%= f.text_area :billing_city, placeholder: "City" %>
+            </div>
+            <%= f.text_area :billing_zip, placeholder: "Zip/Postal Code" %>
+            <div class="form-dbl">
+              <%= f.text_area :billing_first_name, placeholder: "First Name" %>
+              <%= f.text_area :billing_last_name, placeholder: "Last Name" %>
+            </div>
+            <div class="form-dbl">
+              <%= f.label :billing_state_province_label, "State", for: :billing_state_province %>
+              <%= f.select :billing_state_province, options_for_select(us_states), {} %>
+            </div>
+          </div>
+        <% end %>
+    <% end %>
+    <h4>or</h4>
+    <%= link_to "Back", controller: :application, action: :checkout %>
+  <% end %>
+</div>
+<button id="submit-order" class="styled-btn">Proceed to payment</button>

@@ -1,0 +1,28 @@
+.product {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  img {
+    height: 400px;
+    width: 400px;
+    border: 2px solid black;
+    border-radius: 10px;
+    box-shadow: 2px 2px 2px black;
+  }
+  #cart-add {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+  }
+  hr {
+    width: 100%;
+  }
+  .description {
+    padding: 25px;
+    border-radius: 10px;
+    background-color: #F7F7F7;
+    box-shadow: 2px 2px 2px black;
+  }
+}

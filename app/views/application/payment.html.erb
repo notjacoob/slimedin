@@ -1,38 +1,60 @@
-<%= render "navbar" %>
-<h1>Payment</h1>
+<%= stylesheet_link_tag "cart" %>
+<%= stylesheet_link_tag "payment" %>
+<%= stylesheet_link_tag "checkout" %>
+
+<div class="navbar">
+  <div>
+    <%= render "navbar" %>
+    <%= link_to "checkout", "/checkout" %>
+  </div>
+  <h1>Payment</h1>
+</div>
+<hr/>
+
 <h2>Cart</h2>
-<ul>
+<ul class="products">
   <% @cart.cart_products.each do |pid| %>
     <li>
       <% @product = pid.product %>
-      <h3><%= @product.name %> x<%= pid.quantity %></h3>
-      <h4><%= Money.from_cents(@product.price_cents) %></h4>
+      <img src="<%= @product.thumbnail.attached ? url_for(@product.thumbnail) : "/slime.jpg" %>" alt="">
+      <div class="product-name">
+        <%= @product.name %> x<%= pid.quantity %>
+      </div>
+      <div class="product-price">
+        $<%= Money.from_cents(@product.price_cents) %> * <%= pid.quantity %>
+      </div>
     </li>
   <% end %>
 </ul>
-<hr>
-<h2>Payment info: </h2> <br>
-<% if @use_billing.value == "true" %>
-  <h3>Billing address: <%= "#{@billing_address.line1}, #{@billing_address.city}, #{@billing_address.state} #{@billing_address.zip}" %></h3><br>
-<% end %>
-<h3>Shipping address: <%= "#{@shipping_address.line1}, #{@shipping_address.city}, #{@shipping_address.state} #{@shipping_address.zip}" %></h3><br>
-<hr>
-<h2>Amount: </h2><br>
-<ul>
-  <% @subtotal = 0 %>
-  <% @cart.cart_products.each do |pid| %>
-    <li><%= pid.product.name %> x<%= pid.quantity %> - $<%= Money.from_cents(pid.product.price_cents) * pid.quantity %></li>
-    <% @subtotal += pid.product.price_cents * pid.quantity %>
-  <% end %>
-</ul>
-<h3>Currency: USD</h3>
-<h3>Subtotal: $<%= Money.from_cents(@subtotal) %></h3>
-<h3>Sales tax<% if @use_billing.value == "true" %> (<%= @billing_address.city %>, <%= @billing_address.state %>)<% end %>: $<%= Money.from_cents(@tax) %></h3>
-<h3>Total: $<%= Money.from_cents(@total) %></h3>
-<hr>
-<br>
+<div class="info-block">
+  <h2>Payment info: </h2>
+  <ul>
+    <% if @use_billing.value == "true" %>
+      <li>Billing address: <%= "#{@billing_address.line1}, #{@billing_address.city}, #{@billing_address.state} #{@billing_address.zip}" %></li>
+    <% end %>
+    <li>Shipping address: <%= "#{@shipping_address.line1}, #{@shipping_address.city}, #{@shipping_address.state} #{@shipping_address.zip}" %></li>
+    <li>Paying with: only PayPal is supported at the moment, sorry!</li>
+  </ul>
+</div>
+
+<div class="info-block">
+  <h3>Price:</h3>
+  <ul>
+    <% current_user.current_cart.cart_products.each do |pid| %>
+      <li>
+        <% @product = pid.product %>
+        $<%= Money.from_cents(@product.price_cents) %> * <%= pid.quantity %> = $<%= Money.from_cents(@product.price_cents*pid.quantity) %>
+      </li>
+    <% end %>
+  </ul>
+  <div id=confirmers>
+    <h4>Subtotal: $<%= Money.from_cents(@subtotal) %></h4>
+    <h4>Sales tax<% if @use_billing.value == "true" %> (<%= @billing_address.city %>, <%= @billing_address.state %>)<% end %>: $<%= Money.from_cents(@tax) %></h4>
+    <h2>Total: $<%= Money.from_cents(@total) %></h2>
+  </div>
+</div>
 <script src="https://www.paypal.com/sdk/js?client-id=<%= ENV["PAYPAL_CLIENT_ID"] %>"></script>
-<div id="paypal-button-container"></div>
+<div id="paypal-button-container" class="info-block"></div>
 <script type="module">
     paypal.Buttons({
         env: "<%= ENV["PAYPAL_ENV"] %>",

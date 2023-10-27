@@ -1,0 +1,80 @@
+.info-block {
+  display: flex;
+  flex-direction: column;
+  max-width: 25%;
+  padding: 5px;
+  background-color: #F7F7F7;
+  box-shadow: 2px 2px 2px black;
+  border-radius: 5px;
+  margin: 20px;
+}
+.info-block:hover {
+  box-shadow: 3px 3px 3px black;
+  transition: box-shadow 200ms;
+}
+#addresses {
+  display: flex;
+  flex-direction: column;
+  max-width: 25%;
+  padding: 5px;
+  background-color: #F7F7F7;
+  box-shadow: 2px 2px 2px black;
+  border-radius: 5px;
+  align-items: center;
+  margin: 20px;
+}
+#addresses a {
+  text-decoration: none;
+  font-weight: bold;
+  color: dodgerblue;
+  text-shadow: 1px 1px black;
+}
+
+#addresses form {
+  justify-content: center;
+  display: flex;
+  width: 100%;
+}
+
+#addresses select {
+  max-width: 90%;
+  height: 30px;
+  border: 0;
+  border-radius: 5px;
+  box-shadow: 1px 1px 1px black;
+}
+
+.new-adr-form {
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.fields {
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  flex-direction: column;
+}
+
+.form-dbl {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin: 2px;
+}
+.form-dbl textarea {
+  width: 50%;
+}
+.fields textarea:not(.form-dbl) {
+  width: 98%;
+  margin: 2px;
+}
+.fields textarea {
+  border: 0;
+  border-radius: 5px;
+  box-shadow: 1px 1px 1px black;
+}
+#submit-order {
+  margin: 20px;
+}

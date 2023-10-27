@@ -1,5 +1,13 @@
-<%= render "application/navbar" %>
-<%= render "navbar" %>
+<div class="navbar">
+  <div>
+    <%= render "application/navbar" %>
+    <%= render "navbar" %>
+  </div>
+  <h1>Products</h1>
+</div>
+
+<hr/>
+
 <br><br>
 <%= link_to "New Product", "/admin-portal/add-products?new_product=true", method: :get %>
 

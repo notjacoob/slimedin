@@ -1,8 +1,15 @@
-<%= render "application/navbar" %>
-<h1>Admin Portal</h1>
-<ul>
-  <li><h3><%= link_to "Add Products", {controller: :administrator, action: :add_products} %></h3></li>
-  <li><h3><%= link_to "View All Orders", {controller: :administrator, action: :orders} %></h3></li>
-  <li><h3><%= link_to "Global Settings", {controller: :administrator, action: :sitewide_settings} %></h3></li>
-  <li><h3><%= link_to "Mailing Lists", {controller: :administrator, action: :mailing_lists} %></h3></li>
+<%= stylesheet_link_tag "admin_portal" %>
+
+<div class="navbar">
+  <div>
+    <%= render "application/navbar" %>
+  </div>
+  <h1>Admin Portal</h1>
+</div>
+<hr/>
+<ul class="centered-btns">
+  <li><%= link_to "Add Products", {controller: :administrator, action: :add_products}, {class: "styled-btn"}%></li>
+  <li><%= link_to "View All Orders", {controller: :administrator, action: :orders}, {class: "styled-btn"} %></li>
+  <li><%= link_to "Global Settings", {controller: :administrator, action: :sitewide_settings}, {class: "styled-btn"} %></li>
+  <li><%= link_to "Mailing Lists", {controller: :administrator, action: :mailing_lists}, {class: "styled-btn"} %></li>
 </ul>

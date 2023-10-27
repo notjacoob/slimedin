@@ -1,20 +1,30 @@
-<%= render "navbar" %>
-<%= link_to "Products", controller: :application, action: :products %>
-<%= stylesheet_link_tag "products" %>
+<%= stylesheet_link_tag "product" %>
+
 
 <% if @product and @product.listed %>
-  <div class="product">
+  <div class="navbar">
+    <div>
+      <%= render "navbar" %>
+      <%= link_to "Products", controller: :application, action: :products %>
+    </div>
     <h1><%= @product.name %></h1>
-    <h3>$<%= Money.from_cents(@product.price_cents) %></h3>
+  </div>
+  <hr>
+  <div class="product">
     <% if @product.thumbnail.attached? %>
       <img src="<%= url_for @product.thumbnail %>" alt="">
     <% else %>
       <img src="/slime.jpg" alt="">
     <% end %>
     <br><br>
-    <%= button_to "Add To Cart", controller: :orders, action: :add_cart, pid: @product.id %><br>
+    <div id="cart-add">
+      <h3>$<%= Money.from_cents(@product.price_cents) %></h3>
+      <%= button_to "Add To Cart", {controller: :orders, action: :add_cart, pid: @product.id}, {class: "styled-btn"} %><br>
+    </div>
     <hr/>
-    <p><%= @product.description %></p>
+    <div class="description">
+      <p><%= @product.description %></p>
+    </div>
   </div>
 <% else %>
   <h1>Product doesn't exist!</h1>

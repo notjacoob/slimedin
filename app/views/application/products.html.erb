@@ -1,24 +1,29 @@
-<%= render "navbar" %>
-<%= link_to "Cart", "/cart" %>
 <%= stylesheet_link_tag "products" %>
-<h1>Products</h1>
-<ul class="products">
+
+<div class="navbar">
+  <div>
+    <%= render "navbar" %>
+    <%= link_to "Cart", "/cart" %>
+  </div>
+  <h1>Products</h1>
+</div>
+<hr/>
+<div class="products">
   <% Product.all.each do |product| %>
     <% if product.listed %>
-      <li>
         <div class="product">
           <a href="/product/<%= product.id %>">
             <% if product.thumbnail.attached? %>
-              <img src="<%= url_for product.thumbnail %>" height="100" width="100" alt="splaaaaat?">
+              <img src="<%= url_for product.thumbnail %>"alt="splaaaaat?">
             <% else %>
-              <img src="/slime.jpg" height="100" width="100" alt="splaaaat"/>
+              <img src="/slime.jpg" alt="splaaaat"/>
             <% end %>
+          </a>
+          <a href="/product/<%= product.id %>">
             <h3><%= product.name %></h3>
           </a>
-          <hr>
         </div>
-      </li>
     <% end %>
   <% end %>
 
-</ul>
+</div>

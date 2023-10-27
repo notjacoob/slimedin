@@ -84,12 +84,4 @@ Rails.application.configure do
     :enable_starttls_auto => true
   }
 
-  #ActionMailer::Base.smtp_settings = {
-  #  :user_name => 'admin@slimedin.com',
-  #  :password => Rails.application.credentials.smtp_pass,
-  #  :domain => 'smtp.titan.email',
-  #  :port => 587,
-  #  :authentication => :plain,
-  #  :enable_starttls_auto => true
-  #}
 end
