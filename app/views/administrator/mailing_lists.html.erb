@@ -1,43 +1,55 @@
-<%= render 'application/navbar' %>
-<%= render 'navbar' %>
-
-<h1>Mailing Lists</h1>
-<% if params[:new_list] == "true" %>
-  <%= form_with method: :put do |f| %>
-    <%= f.text_field :name %>
-    <%= f.submit %>
-  <% end %>
-<% else %>
-  <%= link_to "New", "/admin-portal/mailing-lists?new_list=true" %>
-<% end %>
-<hr>
-<% MailingList.all.each do |m| %>
-  <h3><%= m.name %></h3><br>
-  <% if params["#{m.name}-new-user"] == "true" %>
-    <%= form_with method: :post do |f| %>
-        <%= f.text_field :email %>
-        <%= f.hidden_field :mailing_list_id, value: m.id %>
+<div class="navbar">
+  <h1>Mailing Lists</h1>
+  <div>
+    <%= render 'application/navbar' %>
+    <%= render 'navbar' %>
+    <% if params[:new_list] == "true" %>
+      <%= form_with method: :put do |f| %>
+        <%= f.text_field :name %>
         <%= f.submit %>
+      <% end %>
+    <% else %>
+      <br>
+      <%= link_to "New List", "/admin-portal/mailing-lists?new_list=true" %>
     <% end %>
-  <% else %>
-    <%= link_to "Add User", "/admin-portal/mailing-lists?#{m.name}-new-user=true" %>
-  <% end %>
-  <%= link_to "Delete List", {controller: :administrator, action: :delete_mailing_list, list: m.id}, method: :delete %>
-  <table border="1" cellpadding="20">
-    <thead>
+  </div>
+</div>
+<hr>
+<%= stylesheet_link_tag "orders" %>
+<% MailingList.all.each do |m| %>
+  <div class="info-block">
+    <table>
+      <thead>
+      <tr>
+        <th><%= m.name %></th>
+        <th></th>
+      </tr>
       <tr>
         <th>User</th>
         <th></th>
       </tr>
-    </thead>
-    <tbody>
+      </thead>
+      <tbody>
+      <tr>
+        <% if params["#{m.name}-new-user"] == "true" %>
+          <%= form_with method: :post do |f| %>
+            <td><%= f.text_field :email %></td>
+            <%= f.hidden_field :mailing_list_id, value: m.id %>
+            <td><%= f.submit %></td>
+          <% end %>
+        <% else %>
+          <td><%= link_to "Add User", "/admin-portal/mailing-lists?#{m.name}-new-user=true" %></td>
+          <td><%= link_to "Delete List", { controller: :administrator, action: :delete_mailing_list, list: m.id }, method: :delete %></td>
+        <% end %>
+      </tr>
       <% m.mailing_list_users.each do |mu| %>
         <tr>
           <td><%= mu.email %></td>
-          <td><%= link_to "Remove", {controller: :administrator, action: :remove_user_mailing_list, user: mu.id}, method: :delete %></td>
+          <td><%= link_to "Remove", { controller: :administrator, action: :remove_user_mailing_list, user: mu.id }, method: :delete %></td>
         </tr>
       <% end %>
-    </tbody>
-  </table>
+      </tbody>
+    </table>
+  </div>
   <hr/>
 <% end %>

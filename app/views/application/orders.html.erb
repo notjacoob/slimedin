@@ -1,3 +1,4 @@
+<%= stylesheet_link_tag "orders" %>
 <div class="navbar">
   <div>
     <%= render 'navbar' %>
@@ -6,19 +7,26 @@
   <h1>Orders</h1>
 </div>
 
+
 <% Order.where(:user_id => current_user.id).each do |order| %>
   <hr>
-  <h2><%= order.created_at.to_s.gsub!(" ", ", ") %> - ID: <%= order.id %></h2>
-  <table border="1" cellpadding="15">
-    <thead>
+  <div class="info-block">
+    <table>
+      <thead>
+      <tr>
+        <th><%= order.created_at.to_s.gsub!(" ", ", ") %> - ID: <%= order.id %></th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
       <tr>
         <th>Product</th>
         <th>Quantity</th>
         <th>Price</th>
         <th>Total</th>
       </tr>
-    </thead>
-    <tbody>
+      </thead>
+      <tbody>
       <% order.cart.cart_products.each do |c| %>
         <tr>
           <td><%= c.product.name %></td>
@@ -26,21 +34,50 @@
           <td>$<%= Money.from_cents(c.product.price_cents * c.quantity) %></td>
         </tr>
       <% end %>
-    <tr>
-      <td></td>
-      <td></td>
-      <td></td>
-      <td><strong>$<%= Money.from_cents(order.price_cents) %></strong></td>
-    </tr>
-    </tbody>
-  </table>
-  <% if order.shipping_address %>
-    <% if order.billing_address %>
-      <% @billing_address = order.billing_address %>
-      <h3>Billing Address: <%= @billing_address.line1 %>, <%= @billing_address.city %>, <%= @billing_address.state %> <%= @billing_address.zip %></h3>
-    <% end %>
-    <% @shipping_address = order.shipping_address %>
-    <h3>Shipping Address: <%= @shipping_address.line1 %>, <%= @shipping_address.city %>, <%= @shipping_address.state %> <%= @shipping_address.zip %></h3>
-    <h4>Order status: <%= order.status %></h4>
-  <% end %>
+      <tr>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><strong>$<%= Money.from_cents(order.price_cents) %></strong></td>
+      </tr>
+      </tbody>
+      <thead>
+      <tr>
+        <th>Info</th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </tr>
+      </thead>
+      <tbody>
+      <% if order.shipping_address %>
+        <% if order.billing_address %>
+          <% @billing_address = order.billing_address %>
+          <tr>
+            <td>Billing Address: <%= @billing_address.line1 %>, <%= @billing_address.city %>
+              , <%= @billing_address.state %> <%= @billing_address.zip %></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+        <% end %>
+        <% @shipping_address = order.shipping_address %>
+        <tr>
+          <td>Shipping Address: <%= @shipping_address.line1 %>, <%= @shipping_address.city %>
+            , <%= @shipping_address.state %> <%= @shipping_address.zip %></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>Order status: <%= order.status %></td>
+          <td></td>
+          <td></td>
+          <td></td>
+        </tr>
+      <% end %>
+      </tbody>
+    </table>
+
+  </div>
 <% end %>

@@ -21,7 +21,7 @@
     }
     $("#submit-order").on("click", e => {
         <% if @use_billing.value == "true" and @new_address %>
-            const checked = document.getElementById("use-same").checked
+        const checked = document.getElementById("use-same").checked
         <% end %>
         let shipping_address_line1
         let shipping_city
@@ -30,12 +30,12 @@
         let shipping_first_name
         let shipping_last_name
         <% if @new_address %>
-            shipping_address_line1 = document.getElementById("shipping_address_line1").value
-            shipping_city = document.getElementById("shipping_city").value
-            shipping_state_province = document.getElementById("shipping_state_province").value
-            shipping_zip  = document.getElementById("shipping_zip").value
-            shipping_first_name = document.getElementById("shipping_first_name").value
-            shipping_last_name = document.getElementById("shipping_last_name").value
+        shipping_address_line1 = document.getElementById("shipping_address_line1").value
+        shipping_city = document.getElementById("shipping_city").value
+        shipping_state_province = document.getElementById("shipping_state_province").value
+        shipping_zip = document.getElementById("shipping_zip").value
+        shipping_first_name = document.getElementById("shipping_first_name").value
+        shipping_last_name = document.getElementById("shipping_last_name").value
         <% end %>
         fetch("/payment-proceed", {
             method: "POST",
@@ -60,13 +60,13 @@
                     zip: checked ? shipping_zip : document.getElementById("billing_zip").value,
                     first_name: checked ? shipping_first_name : document.getElementById("billing_first_name").value,
                     last_name: checked ? shipping_last_name : document.getElementById("billing_last_name").value
-                },<% end %>
+                }, <% end %>
                 <% else %>
-                    type: "existing",
-                    shipping_address_id: document.getElementById("shipping_address_id").value,
-                    <% if @use_billing.value == "true" %>
-                        billing_address_id: document.getElementById("billing_address_id").value
-                    <% end %>
+                type: "existing",
+                shipping_address_id: document.getElementById("shipping_address_id").value,
+                <% if @use_billing.value == "true" %>
+                billing_address_id: document.getElementById("billing_address_id").value
+                <% end %>
                 <% end %>
             })
         }).then((data) => {
@@ -88,7 +88,7 @@
   <% current_user.current_cart.cart_products.each do |pid| %>
     <li>
       <% @product = pid.product %>
-      <img src="<%= @product.thumbnail.attached ? url_for(@product.thumbnail) : "/slime.jpg" %>" alt="">
+      <img src="<%= @product.thumbnail.attached? ? url_for(@product.thumbnail) : "/slime.jpg" %>" alt="">
       <div class="product-name">
         <%= @product.name %> x<%= pid.quantity %>
       </div>
@@ -104,7 +104,8 @@
     <% current_user.current_cart.cart_products.each do |pid| %>
       <li>
         <% @product = pid.product %>
-        $<%= Money.from_cents(@product.price_cents) %> * <%= pid.quantity %> = $<%= Money.from_cents(@product.price_cents*pid.quantity) %>
+        $<%= Money.from_cents(@product.price_cents) %> * <%= pid.quantity %> =
+        $<%= Money.from_cents(@product.price_cents * pid.quantity) %>
       </li>
     <% end %>
   </ul>
@@ -141,30 +142,30 @@
           <%= f.select :shipping_state_province, options_for_select(us_states), {} %>
         </div>
       </div>
-<% end %>
+    <% end %>
     <% if @use_billing.value == "true" %>
       <h2>Billing Address</h2>
       <div class="form-dbl">
         <label for="use-same">Use the same address for billing?</label>
         <input type=checkbox id="use-same" name="use-same" onchange="useSame()">
       </div>
-        <%= form_with class: "new-adr-form" do |f| %>
-          <div class="fields same-usable">
-            <div class="form-dbl">
-              <%= f.text_area :billing_address_line1, placeholder: "Address line 1" %><br>
-              <%= f.text_area :billing_city, placeholder: "City" %>
-            </div>
-            <%= f.text_area :billing_zip, placeholder: "Zip/Postal Code" %>
-            <div class="form-dbl">
-              <%= f.text_area :billing_first_name, placeholder: "First Name" %>
-              <%= f.text_area :billing_last_name, placeholder: "Last Name" %>
-            </div>
-            <div class="form-dbl">
-              <%= f.label :billing_state_province_label, "State", for: :billing_state_province %>
-              <%= f.select :billing_state_province, options_for_select(us_states), {} %>
-            </div>
+      <%= form_with class: "new-adr-form" do |f| %>
+        <div class="fields same-usable">
+          <div class="form-dbl">
+            <%= f.text_area :billing_address_line1, placeholder: "Address line 1" %><br>
+            <%= f.text_area :billing_city, placeholder: "City" %>
           </div>
-        <% end %>
+          <%= f.text_area :billing_zip, placeholder: "Zip/Postal Code" %>
+          <div class="form-dbl">
+            <%= f.text_area :billing_first_name, placeholder: "First Name" %>
+            <%= f.text_area :billing_last_name, placeholder: "Last Name" %>
+          </div>
+          <div class="form-dbl">
+            <%= f.label :billing_state_province_label, "State", for: :billing_state_province %>
+            <%= f.select :billing_state_province, options_for_select(us_states), {} %>
+          </div>
+        </div>
+      <% end %>
     <% end %>
     <h4>or</h4>
     <%= link_to "Back", controller: :application, action: :checkout %>

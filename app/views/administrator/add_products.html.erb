@@ -6,72 +6,84 @@
   <h1>Products</h1>
 </div>
 
+<%= stylesheet_link_tag "orders" %>
+
 <hr/>
 
 <br><br>
-<%= link_to "New Product", "/admin-portal/add-products?new_product=true", method: :get %>
 
 <table border="1" cellpadding="10">
   <thead>
-    <tr>
-      <th>Image</th>
-      <th>Name</th>
-      <th>Description</th>
-      <th>Price</th>
-      <th>Listed</th>
-      <th></th>
-      <th></th>
-    </tr>
+  <tr>
+    <th>Image</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Price</th>
+    <th>Listed</th>
+    <th></th>
+    <th></th>
+  </tr>
   </thead>
   <tbody>
-    <% Product.all.each do |p| %>
-      <% if params[:edit] == "#{p.id}" %>
-        <%= form_with method: :put do |f| %>
+  <tr>
+    <td><%= link_to "New Product", "/admin-portal/add-products?new_product=true", method: :get %></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <% Product.all.each do |p| %>
+    <% if params[:edit] == "#{p.id}" %>
+      <%= form_with method: :put do |f| %>
         <tr>
-            <% if p.thumbnail.attached? %>
-              <td><%= f.file_field :thumbnail, accept: "image/png,image/jpeg", value: url_for(p.thumbnail) %>
-            <% else %>
-              <td><%= f.file_field :thumbnail, accept: "image/png,image/jpeg" %>
-            <% end %>
-            <td><%= f.text_field :name, value: p.name %></td>
-            <td><%= f.text_area :description, value: p.description %></td>
-            <td><%= f.number_field :price_cents, value: p.price_cents %></td>
-            <td><%= p.listed %></td>
-            <%= f.hidden_field :id, value: "#{p.id}" %>
+          <% if p.thumbnail.attached? %>
+            <td><%= f.file_field :thumbnail, accept: "image/png,image/jpeg", value: url_for(p.thumbnail) %>
+          <% else %>
+            <td><%= f.file_field :thumbnail, accept: "image/png,image/jpeg" %>
+          <% end %>
+          <td><%= f.text_field :name, value: p.name %></td>
+          <td><%= f.text_area :description, value: p.description %></td>
+          <td><%= f.number_field :price_cents, value: p.price_cents %></td>
+          <td><%= p.listed %></td>
+          <%= f.hidden_field :id, value: "#{p.id}" %>
           <td><%= f.submit %></td>
           <td><%= link_to "Cancel", "/admin-portal/add-products" %></td>
         </tr>
-        <% end %>
-      <% else %>
-        <tr>
-          <td>
-            <% if p.thumbnail.attached? %>
-              <img src="<%= url_for p.thumbnail %>" width="75" height="75" alt="">
-            <% else %>
-              <img src="/slime.jpg" width="75" height="75" alt="">
-            <% end %>
-          </td>
-          <td title="ID: <%= p.id %>"><%= p.name %></td>
-          <td><%= p.description %></td>
-          <td>$<%= Money.from_cents(p.price_cents) %></td>
-          <td><%= p.listed %></td>
-          <td><%= link_to "Edit", "/admin-portal/add-products?edit=#{p.id}" %></td>
-          <td><%= link_to p.listed ? "Delist" : "Relist", {action: :change_product_listing, controller: :administrator, id: "#{p.id}"}, method: :post %></td>
-        </tr>
       <% end %>
+    <% else %>
+      <tr>
+        <td>
+          <% if p.thumbnail.attached? %>
+            <img src="<%= url_for p.thumbnail %>" width="75" height="75" alt="">
+          <% else %>
+            <img src="/slime.jpg" width="75" height="75" alt="">
+          <% end %>
+        </td>
+        <td title="ID: <%= p.id %>"><%= p.name %></td>
+        <td><%= p.description %></td>
+        <td>$<%= Money.from_cents(p.price_cents) %></td>
+        <td><%= p.listed %></td>
+        <td><%= link_to "Edit", "/admin-portal/add-products?edit=#{p.id}" %></td>
+        <td><%= link_to p.listed ? "Delist" : "Relist", { action: :change_product_listing, controller: :administrator, id: "#{p.id}" }, method: :post %></td>
+      </tr>
     <% end %>
-    <% if params[:new_product] == "true" %>
+  <% end %>
+  <% if params[:new_product] == "true" %>
     <tr>
-    <%= form_with do |f| %>
-          <td><%= f.file_field :thumbnail, accept: "image/png,image/jpeg" %></td>
-          <td><%= f.text_field :name, placeholder: "Product Name" %></td>
-          <td><%= f.text_area :description, placeholder: "Product Description" %></td>
-          <td><%= f.number_field :price_cents, placeholder: "Price in Cents" %></td>
+      <%= form_with do |f| %>
+        <td><%= f.file_field :thumbnail, accept: "image/png,image/jpeg" %></td>
+        <td><%= f.text_field :name, placeholder: "Product Name" %></td>
+        <td><%= f.text_area :description, placeholder: "Product Description" %></td>
+        <td><%= f.number_field :price_cents, placeholder: "Price in Cents" %></td>
         <td><%= f.submit %></td>
       <% end %>
+      <td><%= link_to "Cancel", "/admin-portal/add-products" %></td>
+      <td></td>
     </tr>
   <% end %>
   </tbody>
 </table>
 <br>
-<p>Cannot be deleted because it will corrupt orders that exist with the item. <br>A method could possibly found to remove the product from literally everything but the database.</p>
+<p>Cannot be deleted because it will corrupt orders that exist with the item. <br>A method could possibly found to
+  remove the product from literally everything but the database.</p>

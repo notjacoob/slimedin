@@ -15,12 +15,12 @@
     <% @cart.cart_products.each do |pid| %>
       <li>
         <% @product = pid.product %>
-        <img src="<%= @product.thumbnail.attached ? url_for(@product.thumbnail) : "/slime.jpg" %>" alt="">
+        <img src="<%= pid.product.thumbnail.attached? ? url_for(pid.product.thumbnail) : "/slime.jpg" %>" alt="">
         <div class="product-name">
           <%= @product.name %>
         </div>
         <div class="quantity-counter">
-          <%= button_to "+", {controller: :orders, action: :add_cart_qty, pid: @product.id}, {class: "inc"}%>
+          <%= button_to "+", { controller: :orders, action: :add_cart_qty, pid: @product.id }, { class: "inc" } %>
           <input id=counter-value class="value" type=number value=<%= pid.quantity %>>
           <%= button_to "-", { controller: :orders, action: :remove_cart_qty, pid: @product.id }, { class: "inc" } %>
         </div>
@@ -33,7 +33,7 @@
   <br>
   <br>
   <div id=checkout-container>
-    <%= button_to "Checkout", {controller: :application, action: :checkout}, {:method => :get, class: "styled-btn"} %>
+    <%= button_to "Checkout", { controller: :application, action: :checkout }, { :method => :get, class: "styled-btn" } %>
   </div>
 <% else %>
   <h2>Your cart is empty!</h2>
